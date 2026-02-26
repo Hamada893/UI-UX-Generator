@@ -20,13 +20,13 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-    <html lang="en">
-      <body
-        className={appFont.className}
-      >
-        <Provider>{children}</Provider>
-      </body>
-    </html>
+      <html lang="en">
+        <body
+          className={appFont.className}
+        >
+          <Provider>{children}</Provider>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
