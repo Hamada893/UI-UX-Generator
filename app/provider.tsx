@@ -1,6 +1,6 @@
 'use client'
 
-import { UserDetail, UserDetailContext } from "@/context/USerDetailContext";
+import { UserDetail, UserDetailContext } from "@/context/UserDetailContext";
 import axios from "axios";
 import { type ReactNode, useEffect, useState } from "react"
 
