@@ -1,9 +1,14 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { SignInButton, UserButton, useUser } from '@clerk/nextjs'
 
 function Header() {
+  const {user} = useUser()
+  
   return (
     <div className='flex items-center justify-between px-10 py-4'>
       <div className='flex items-center gap-2'>
@@ -22,9 +27,13 @@ function Header() {
           </Link>
         </li>
       </ul>
-      <Button className='cursor-pointer'>
-        Get Started
-      </Button>
+      {!user ? (
+        <SignInButton mode="modal">
+          <Button className="cursor-pointer">Get Started</Button>
+        </SignInButton>
+      ) : (
+        <UserButton />
+      )}
     </div>
   )
 }
