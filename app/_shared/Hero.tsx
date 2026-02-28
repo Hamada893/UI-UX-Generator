@@ -45,15 +45,20 @@ function Hero() {
     }
     setLoading(true)
 
-    const result = await axios.post('/api/project', {
-      userInput: selectedSuggestion,
-      deviceType: deviceType,
-      projectId: crypto.randomBytes(16).toString('hex'),
-    })
-    console.log(result.data)
-    setLoading(false)
-
-    // Navigate to the project page
+    try {
+      const result = await axios.post('/api/project', {
+        userInput: selectedSuggestion,
+        deviceType: deviceType,
+        projectId: crypto.randomBytes(16).toString('hex'),
+      })
+      setLoading(false)
+      // Navigate to the project page
+      
+    } catch (error) {
+      console.error('Error creating project', error)
+    } finally {
+      setLoading(false)
+    }  
 }
 
   return (
@@ -116,7 +121,7 @@ function Hero() {
               className="ml-auto cursor-pointer" 
               size="sm" 
               variant="default"
-              disabled={loading}
+              disabled={loading || !selectedSuggestion?.trim()}
               onClick={() => onCreateProject()}
             >
               {loading ? <Loader className='animate-spin' /> : <Send />}
@@ -130,9 +135,17 @@ function Hero() {
           return (
             <div 
               key={index} 
-              className='p-2 border rounded-2xl flex flex-col items-center bg-white z-5 cursor-pointer'
+              role="button"
+              tabIndex={0}
+              className='p-2 border rounded-2xl flex flex-col items-center bg-white z-5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary'
               onClick={() => setSelectedSuggestion(suggestion?.description)}
-            >
+              onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setSelectedSuggestion(suggestion.description)
+              }
+            }}
+           >
               <h2 className='text-lg'>{suggestion?.icon}</h2>
               <h2 className='text-center line-clamp-2 text-sm'>{suggestion?.name}</h2>
             </div>
