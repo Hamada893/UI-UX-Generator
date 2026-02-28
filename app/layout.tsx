@@ -23,6 +23,7 @@ export default function RootLayout({
       <html lang="en">
         <body
           className={appFont.className}
+          suppressHydrationWarning
         >
           <Provider>{children}</Provider>
         </body>
