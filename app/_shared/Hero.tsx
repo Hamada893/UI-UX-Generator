@@ -25,6 +25,7 @@ import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import crypto from 'crypto'
+import  Typewriter  from '@/components/fancy/text/typewriter'
 
 function Hero() {
 
@@ -86,9 +87,22 @@ function Hero() {
         <ChevronRight className="ml-1 size-4 stroke-neutral-500 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
       </div>
     </div>
-      <h2
-        className='text-5xl font-bold text-center'
-      >Design High quality <span className='text-primary'>Websites</span> and <span className='text-primary'>Mobile</span> App Designs</h2>
+      <h2 className='text-5xl font-bold text-center'>
+          Create <Typewriter
+                  text={[
+                    "High Quality",
+                    "Beautiful",
+                    "Responsive",
+                    "Fast",
+                    "Stunning",
+                    "Polished",
+                  ]}
+                  speed={70}
+                  waitTime={1500}
+                  deleteSpeed={40}
+                  cursorChar={"_"}
+                />
+        <span className='text-primary'>Websites</span> and <span className='text-primary'>Mobile</span> App Designs</h2>
       <p className='text-center text-gray-600 mt-3 text-lg'>Imagine your idea and turn it into reality.</p>
       
       
