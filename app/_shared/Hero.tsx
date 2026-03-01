@@ -144,14 +144,14 @@ function Hero() {
         </InputGroup>
       </div>
 
-      <div className='flex gap-5 mt-5'>
+      <div className='flex gap-5 mt-8 justify-center'>
         {suggestions.map((suggestion, index) => {
           return (
             <div 
               key={index} 
               role="button"
               tabIndex={0}
-              className='p-2 border rounded-2xl flex flex-col items-center bg-white z-5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary'
+              className='p-3 border rounded-2xl flex flex-col items-center bg-white z-5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary'
               onClick={() => setSelectedSuggestion(suggestion?.description)}
               onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
