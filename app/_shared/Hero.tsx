@@ -54,6 +54,7 @@ function Hero() {
       })
       setLoading(false)
       // Navigate to the project page
+      router.push(`/project/${result?.data?.projectId}`)
       
     } catch (error) {
       console.error('Error creating project', error)
