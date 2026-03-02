@@ -34,6 +34,7 @@ function Hero() {
   const {user} = useUser()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const projectId = crypto.randomBytes(16).toString('hex')
 
   const onCreateProject = async () => {
     if (!user) {
@@ -50,10 +51,12 @@ function Hero() {
       const result = await axios.post('/api/project', {
         userInput: selectedSuggestion,
         deviceType: deviceType,
-        projectId: crypto.randomBytes(16).toString('hex'),
+        projectId: projectId,
       })
       setLoading(false)
-      // Navigate to the project page
+      if (!projectId) {
+        throw new Error('Project creation succeeded but response is missing projectId')
+      }
       router.push(`/project/${result?.data?.projectId}`)
       
     } catch (error) {

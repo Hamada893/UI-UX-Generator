@@ -35,15 +35,17 @@ function SettingsSection() {
       <div className='mt-5'>
         <h2 className='text-sm mb-2'>Themes</h2>
         <div className='h-[200px] overflow-y-auto'>
-          {THEME_NAME_LIST.map((theme, index) => (
-            <div 
-              className={`p-3 border rounded-xl mb-2 cursor-pointer
+          {THEME_NAME_LIST.map((theme) => (
+            <button 
+              key={theme}
+              type='button'
+              className={`w-full p-3 border rounded-xl mb-2 cursor-pointer
                 ${selectedTheme === theme ? 'border-primary bg-primary/10' : ''}
               `} 
               onClick={() => setSelectedTheme(theme)}
             >
               <h2>{theme}</h2>
-              <div className='flex gap-2'>
+              <div className='flex gap-2 justify-center items-center'>
                 <div className={`h-4 w-4 rounded-full`}
                 style={{ background: THEMES[theme]?.primary }}> 
                 </div>
@@ -62,11 +64,11 @@ function SettingsSection() {
                   ${THEMES[theme]?.background || '#000000'},
                   ${THEMES[theme]?.primary || '#000000'},
                   ${THEMES[theme]?.secondary || '#000000'},
-                  ${THEMES[theme]?.accent},
+                  ${THEMES[theme]?.accent || '#000000'}
                 )` }}> 
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
