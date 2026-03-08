@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/config/db";
 import { ProjectsTable, usersTable } from "@/config/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
@@ -51,4 +51,14 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+export async function GET(req: NextRequest) {
+  const projectId = await req.nextUrl.searchParams.get("projectId")
+  const user = await currentUser()
+  const result = await db.select().from(ProjectsTable)
+    .where(and(eq(ProjectsTable.projectId, projectId as string), eq(ProjectsTable.userId, user?.primaryEmailAddress?.emailAddress ?? "" as string)))
+  if (!result) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 })
+  }
+  return NextResponse.json(result[0])
 }
