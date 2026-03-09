@@ -5,7 +5,7 @@ import ProjectHeader from "./_shared/ProjectHeader";
 import SettingsSection from "./_shared/SettingsSection";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import { ProjectDetail } from "@/type/types";
+import { ProjectDetail, ScreenConfig } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
 
 export default function ProjectCanvasPage() {
@@ -13,6 +13,7 @@ export default function ProjectCanvasPage() {
   const [projectDetail, setProjectDetail] = useState<ProjectDetail | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('Loading...')
+  const [screenConfig, setScreenConfig] = useState<ScreenConfig[]>([])
 
 useEffect(() => {
     projectId && getProjectDetail()
@@ -23,9 +24,18 @@ useEffect(() => {
     setLoadingMessage('Loading...')
     const result = await axios.get(`/api/project?projectId=${projectId}`)
     console.log(result.data)
-    setProjectDetail(result?.data)
+    setProjectDetail(result?.data?.projectDetail)
+    setScreenConfig(result?.data?.screenConfig)
+    if (result?.data?.screenConfig?.length === 0) {
+      generateScreenConfig()
+    }
     setLoading(false)
   }
+
+  const generateScreenConfig = async () => {
+    
+  }
+
   return (
     <div>
       <ProjectHeader />
