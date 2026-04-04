@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/config/db";
-import { ProjectsTable, usersTable } from "@/config/schema";
+import { ProjectsTable, ScreenConfigTable, usersTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
@@ -60,7 +60,11 @@ export async function GET(req: NextRequest) {
     const user = await currentUser();
 
     const result = await db.select().from(ProjectsTable).where(and(eq(ProjectsTable.projectId, projectId as string), eq(ProjectsTable.userId, user?.primaryEmailAddress?.emailAddress as string)));
-    return NextResponse.json(result[0]);
+    const screenConfig = await db.select().from(ScreenConfigTable).where(eq(ScreenConfigTable.projectId, projectId as string));
+    return NextResponse.json({
+      projectDetail: result[0],
+      screenConfig: screenConfig,
+    });
   } catch (err) {
     console.error("[GET /api/project]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
