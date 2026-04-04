@@ -2,6 +2,10 @@ import { NextRequest } from "next/server";
 import { openrouter } from "@/config/openrouter";
 import { APP_LAYOUT_CONFIG_PROMPT } from "@/data/Prompt";
 import { NextResponse } from "next/server";
+import { ScreenConfigTable } from "@/config/schema";
+import { db } from "@/config/db";
+import { ProjectsTable } from "@/config/schema";
+import { eq } from "drizzle-orm";
 export async function POST(req: NextRequest) {
   const { userInput, deviceType, projectId } = await req.json();
 
@@ -30,7 +34,7 @@ export async function POST(req: NextRequest) {
 
   const aiResponse = await openrouter.chat.send({
     chatRequest: {
-      model: "qwen/qwen3.6-plus:free",
+      model: "stepfun/step-3.5-flash:free", //use qwen/qwen3.6-plus:free if run into visual issues in the future
       messages: [
         {
           role: "system",
@@ -81,6 +85,26 @@ export async function POST(req: NextRequest) {
   // #endregion
   
   const JSONAiResult = JSON.parse(aiResponse.choices[0]?.message?.content as string);
-  console.log(aiResponse)
-  return NextResponse.json(JSONAiResult);
+
+
+  if (JSONAiResult?.projectVisualDescription && JSONAiResult?.projectName) {
+    await db.update(ProjectsTable).set({
+      projectVisualDescription: JSONAiResult?.projectVisualDescription,
+      projectName: JSONAiResult?.projectName,
+      theme: JSONAiResult?.theme,
+    }).where(eq(ProjectsTable.projectId, projectId as string));
+
+    JSONAiResult.screens?.forEach(async (screen: any) => {
+      const result = await db.insert(ScreenConfigTable).values({
+        projectId: projectId,
+        purpose: screen.purpose,
+        screenDescription: screen?.layoutDescription,
+        screenId: screen?.id,
+        screenName: screen?.name,
+      })
+    })
+    return NextResponse.json(JSONAiResult);
+  } else {
+    return NextResponse.json({ error: "Failed to generate project config, Internal Server Error" }, { status: 500 });
+  }
 }

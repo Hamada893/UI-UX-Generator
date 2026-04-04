@@ -47,6 +47,7 @@ export default function ProjectCanvasPage() {
       userInput: projectDetail?.userInput,
     })
     console.log(result.data);
+    getProjectDetail();
     setIsLoading(false)
   }
 
@@ -59,7 +60,7 @@ export default function ProjectCanvasPage() {
           <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMsg}...</h2>
         </div>}
         
-        <SettingsSection />
+        <SettingsSection projectDetail={projectDetail as ProjectDetail} />
 
         {/* {Canvas} */}
       </div>
