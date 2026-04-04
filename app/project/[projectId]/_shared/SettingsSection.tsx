@@ -84,8 +84,8 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
       <div className='mt-5'>
         <h2 className='text-sm mb-2'>Extras</h2>
         <div className='flex gap-3'>
-          <Button size={'sm'} variant={'outline'} className='mt-2'><Camera/>Screenshot</Button>
-          <Button size={'sm'} variant={'outline'} className='mt-2'><Share/>Share</Button>
+          <Button size={'sm'} variant={'outline'} className='mt-2 cursor-pointer'><Camera/>Screenshot</Button>
+          <Button size={'sm'} variant={'outline'} className='mt-2 cursor-pointer'><Share/>Share</Button>
         </div>
       </div>
     </div>
