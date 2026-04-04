@@ -52,22 +52,21 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-export async function GET(req: NextRequest) {
-  const projectId = req.nextUrl.searchParams.get("projectId")
-  const user = await currentUser()
-  
-  try {
-    const result = await db.select().from(ProjectsTable)
-      .where(and(eq(ProjectsTable.projectId, projectId as string), eq(ProjectsTable.userId, user?.primaryEmailAddress?.emailAddress ?? "" as string)))
-    const screenConfig = await db.select().from(ScreenConfigTable)
-      .where(eq(ScreenConfigTable.projectId, projectId as string))
 
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const projectId = searchParams.get('projectId');
+    const user = await currentUser();
+
+    const result = await db.select().from(ProjectsTable).where(and(eq(ProjectsTable.projectId, projectId as string), eq(ProjectsTable.userId, user?.primaryEmailAddress?.emailAddress as string)));
+    const screenConfig = await db.select().from(ScreenConfigTable).where(eq(ScreenConfigTable.projectId, projectId as string));
     return NextResponse.json({
       projectDetail: result[0],
       screenConfig: screenConfig,
-
-    })
+    });
   } catch (err) {
-    return NextResponse.json({ error: "Project not found", errorMessage: err }, { status: 404 })
+    console.error("[GET /api/project]", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

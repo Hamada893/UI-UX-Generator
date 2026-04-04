@@ -1,39 +1,64 @@
 'use client'
 
-import { useEffect, useState } from "react";
 import ProjectHeader from "./_shared/ProjectHeader";
 import SettingsSection from "./_shared/SettingsSection";
 import axios from "axios";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { ProjectDetail, ScreenConfig } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
 
 export default function ProjectCanvasPage() {
-  const { projectId } = useParams()
-  const [projectDetail, setProjectDetail] = useState<ProjectDetail | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [loadingMessage, setLoadingMessage] = useState('Loading...')
-  const [screenConfig, setScreenConfig] = useState<ScreenConfig[]>([])
+  const { projectId } = useParams();
+  const [projectDetail, setProjectDetail] = useState<ProjectDetail>();
+  const [screenConfig, setScreenConfig] = useState<ScreenConfig[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState('Loading');
+  const hasRequestedConfigRef = useRef(false)
 
-useEffect(() => {
-    projectId && getProjectDetail()
-  }, [projectId])
+  useEffect(() => {
+    getProjectDetail();
+  }, [projectId]);
 
   const getProjectDetail = async () => {
-    setLoading(true)
-    setLoadingMessage('Loading...')
-    const result = await axios.get(`/api/project?projectId=${projectId}`)
-    console.log(result.data)
-    setProjectDetail(result?.data?.projectDetail)
-    setScreenConfig(result?.data?.screenConfig)
-    if (result?.data?.screenConfig?.length === 0) {
-      generateScreenConfig()
-    }
-    setLoading(false)
+    try {
+        setIsLoading(true);
+        setLoadingMsg('Loading...');
+        const result = await axios.get(`/api/project?projectId=${projectId}`);
+        setProjectDetail(result?.data?.projectDetail);
+        setScreenConfig(result?.data?.screenConfig ?? []);
+        console.log(result?.data);
+      } catch (error) {
+        console.error('Failed to fetch project detail', error);
+      } finally {
+        setIsLoading(false);
+      }
   }
 
+  useEffect(() => {
+    if (!projectDetail) return;
+    if (screenConfig.length > 0) return;
+    if (hasRequestedConfigRef.current) return;
+
+    hasRequestedConfigRef.current = true;
+    void generateScreenConfig();
+  }, [projectDetail, screenConfig.length])
+
   const generateScreenConfig = async () => {
-    
+    try {
+        setIsLoading(true);
+        setLoadingMsg('Generating screen config...');
+        await axios.post('/api/generate-config', {
+          projectId,
+          deviceType: projectDetail?.deviceType,
+          userInput: projectDetail?.userInput,
+        });
+        await getProjectDetail();
+      } catch (error) {
+        console.error('Failed to generate screen config', error);
+      } finally {
+        setIsLoading(false);
+      }
   }
 
   return (
@@ -41,11 +66,12 @@ useEffect(() => {
       <ProjectHeader />
 
       <div>
-        {loading && 
-        <div className="p-3 text-sm absolute left-1/2 top-20 text-shadow-sm bg-blue-300/20 border border-blue-400 rounded-xl">
-          <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" />{loadingMessage}</h2>
+        {isLoading && <div className="absolute p-3 bg-blue-300/20 border-blue-400 border rounded-xl left-1/2 top-20">
+          <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMsg}...</h2>
         </div>}
-        <SettingsSection />
+        
+        <SettingsSection projectDetail={projectDetail as ProjectDetail} />
+
         {/* {Canvas} */}
       </div>
     </div>

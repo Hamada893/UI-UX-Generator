@@ -19,6 +19,7 @@ OUTPUT JSON SHAPE (TOP LEVEL)
 {
   "projectName": string,
   "theme":string,
+  "projectVisualDescription": string,
   "screens": [
     {
       "id": string,

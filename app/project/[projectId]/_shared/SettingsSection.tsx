@@ -6,13 +6,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { Camera, Share, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { THEME_NAME_LIST, ThemeKey, THEMES } from '@/data/themes'
+import { ProjectDetail } from '@/type/types'
+import { useEffect } from 'react'
 
-function SettingsSection() {
+
+function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
 
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey>(THEME_NAME_LIST[0])
-  const [projectName, setProjectName] = useState<string>('')
+  const [projectName, setProjectName] = useState<string>(projectDetail?.projectName || '')
   const [userPrompt, setUserPrompt] = useState<string>('')
 
+  useEffect(() => {
+    projectDetail && setProjectName(projectDetail?.projectName || '')
+  }, [projectDetail])
 
   return (
     <div className='w-[300px] h-[90vh] p-5 border-r'>
@@ -23,6 +29,7 @@ function SettingsSection() {
       <div className='mt-5'>
         <h2 className='text-sm mb-2'>Project Name</h2>
           <Input placeholder='Project Name' 
+          value={projectName}
           onChange={(e) => setProjectName(e.target?.value || '')}
         />
       </div>
@@ -77,8 +84,8 @@ function SettingsSection() {
       <div className='mt-5'>
         <h2 className='text-sm mb-2'>Extras</h2>
         <div className='flex gap-3'>
-          <Button size={'sm'} variant={'outline'} className='mt-2 cursor-pointer'><Camera/>Screenshot</Button>
-          <Button size={'sm'} variant={'outline'} className='mt-2 cursor-pointer'><Share/>Share</Button>
+          <Button size={'sm'} variant={'outline'} className='mt-2'><Camera/>Screenshot</Button>
+          <Button size={'sm'} variant={'outline'} className='mt-2'><Share/>Share</Button>
         </div>
       </div>
     </div>
