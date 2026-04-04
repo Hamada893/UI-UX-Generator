@@ -3,7 +3,7 @@
 import ProjectHeader from "./_shared/ProjectHeader";
 import SettingsSection from "./_shared/SettingsSection";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { ProjectDetail, ScreenConfig } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
@@ -14,41 +14,51 @@ export default function ProjectCanvasPage() {
   const [screenConfig, setScreenConfig] = useState<ScreenConfig[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('Loading');
+  const hasRequestedConfigRef = useRef(false)
 
   useEffect(() => {
     getProjectDetail();
   }, [projectId]);
 
   const getProjectDetail = async () => {
-    setIsLoading(true);
-    setLoadingMsg('Loading...');
-    const result = await axios.get(`/api/project?projectId=${projectId}`);
-    console.log(result.data);
-    setProjectDetail(result?.data?.projectDetail);
-    setScreenConfig(result?.data?.screenConfig);
-    // if (result.data?.screenConfig.length === 0) {
-    //   generateScreenConfig();
-    // }
-    setIsLoading(false);
+    try {
+        setIsLoading(true);
+        setLoadingMsg('Loading...');
+        const result = await axios.get(`/api/project?projectId=${projectId}`);
+        setProjectDetail(result?.data?.projectDetail);
+        setScreenConfig(result?.data?.screenConfig ?? []);
+        console.log(result?.data);
+      } catch (error) {
+        console.error('Failed to fetch project detail', error);
+      } finally {
+        setIsLoading(false);
+      }
   }
 
   useEffect(() => {
-    if (projectDetail && screenConfig && screenConfig.length === 0) {
-      generateScreenConfig();
-    }
-  },[projectDetail && screenConfig])
+    if (!projectDetail) return;
+    if (screenConfig.length > 0) return;
+    if (hasRequestedConfigRef.current) return;
+
+    hasRequestedConfigRef.current = true;
+    void generateScreenConfig();
+  }, [projectDetail, screenConfig.length])
 
   const generateScreenConfig = async () => {
-    setIsLoading(true);
-    setLoadingMsg('Generating screen config...');
-    const result = await axios.post('/api/generate-config', {
-      projectId: projectId,
-      deviceType: projectDetail?.deviceType,
-      userInput: projectDetail?.userInput,
-    })
-    console.log(result.data);
-    getProjectDetail();
-    setIsLoading(false)
+    try {
+        setIsLoading(true);
+        setLoadingMsg('Generating screen config...');
+        await axios.post('/api/generate-config', {
+          projectId,
+          deviceType: projectDetail?.deviceType,
+          userInput: projectDetail?.userInput,
+        });
+        await getProjectDetail();
+      } catch (error) {
+        console.error('Failed to generate screen config', error);
+      } finally {
+        setIsLoading(false);
+      }
   }
 
   return (

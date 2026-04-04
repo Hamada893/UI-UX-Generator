@@ -2,18 +2,20 @@
   id: number,
   projectId: string,
   deviceType: string,
-  userInput: string,
-  createdOn: Date,
-  projectName?: string,
-  theme?: string,
+  userInput: string | null,
+  createdOn: string | null,
+  projectName: string | null,
+  theme: string | null,
+  projectVisualDescription: string | null,
  }
 
  export type ScreenConfig = {
   id: number,
-  screenId: string,
-  screenName: string,
-  purpose: string,
-  screenDescription: string,
-  code: string,
+  projectId: string | null,
+  screenId: string | null,
+  screenName: string | null,
+  purpose: string | null,
+  screenDescription: string | null,
+  code: string | null,
  }
 

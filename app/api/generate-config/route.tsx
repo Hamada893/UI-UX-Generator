@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
           content: [
             {
               type: "text",
-              text: APP_LAYOUT_CONFIG_PROMPT.replace("{deviceType}", deviceType),
+              text: APP_LAYOUT_CONFIG_PROMPT.replaceAll("{deviceType}", deviceType),
             },
           ],
         },
