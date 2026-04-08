@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import DotGrid from '@/components/DotGrid';
+import ScreenFrame from './ScreenFrame';
 
 function Canvas() {
+  const [panningEnabled, setPanningEnabled] = useState(true)
   return (
     <div 
       className='w-full h-screen bg-grey-100 relative z-10'
@@ -34,11 +36,13 @@ function Canvas() {
         limitToBounds={false}
         wheel={{ step: 0.8 }}
         doubleClick={{disabled: false}}
+        panning={{disabled: !panningEnabled}}
       >
         <TransformComponent 
           wrapperStyle={{ width: '100%', height: '100%' }}
         >
-          <h2>Hello</h2>
+          <ScreenFrame x={0} y={0} setPanningEnabled={setPanningEnabled}/>
+          <ScreenFrame x={300} y={0} setPanningEnabled={setPanningEnabled}/>
         </TransformComponent>
       </TransformWrapper>
     </div>
