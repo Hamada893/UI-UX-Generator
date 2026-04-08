@@ -69,26 +69,31 @@ export default function ProjectCanvasPage() {
   }
 
   const generateScreenUI = async () => {
-    setIsLoading(true)
+    try {
+      setIsLoading(true)
 
-    for (let index = 0; index < screenConfig?.length; index++) {
-      const screen = screenConfig[index]
-      if (screen.code) {
-        return;
+      for (let index = 0; index < screenConfig?.length; index++) {
+        const screen = screenConfig[index]
+        if (screen.code) {
+          continue;
+        }
+
+        setLoadingMsg(`Generating UI for screen ${index + 1}`);
+        const result = await axios.post('/api/generate-screen-ui', {
+          projectId,
+          screenId: screen?.screenId,
+          screenName: screen?.screenName,
+          purpose: screen?.purpose,
+          screenDescription: screen.screenDescription,
+        })
+        console.log(result?.data);
       }
-
-      setLoadingMsg(`Generating UI for screen ${index + 1}`);
-      const result = await axios.post('/api/generate-screen-ui', {
-        projectId,
-        screenId: screen?.screenId,
-        screenName: screen?.screenName,
-        purpose: screen?.purpose,
-        screenDescription: screen.screenDescription,
-      })
-      console.log(result?.data);
+      await getProjectDetail();
+    } catch (error) {
+      console.error('Failed to generate screen UI', error);
+    } finally {
+      setIsLoading(false)
     }
-    await getProjectDetail();
-    setIsLoading(false)
   }
 
   return (
@@ -97,7 +102,7 @@ export default function ProjectCanvasPage() {
 
       <div>
         {isLoading && <div className="absolute p-3 bg-blue-300/20 border-blue-400 border rounded-xl left-1/2 top-20">
-          <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMsg}...</h2>
+          <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMsg}</h2>
         </div>}
         
         <SettingsSection projectDetail={projectDetail as ProjectDetail} />

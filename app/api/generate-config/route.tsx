@@ -34,6 +34,13 @@ const parseAiJson = (raw: string) => {
 export async function POST(req: NextRequest) {
   const { userInput, deviceType, projectId } = await req.json();
 
+  if (!projectId || !userInput || !deviceType) {
+    return NextResponse.json(
+      { error: "Invalid request payload: missing projectId, userInput, or deviceType" },
+      { status: 400 }
+    );
+  }
+
   try {
     const { openrouter } = await import("@/config/openrouter");
     const aiResponse = await openrouter.chat.send({
@@ -79,15 +86,15 @@ export async function POST(req: NextRequest) {
         })
         .where(eq(ProjectsTable.projectId, projectId as string));
 
-      JSONAiResult.screens?.forEach(async (screen: any) => {
-        await db.insert(ScreenConfigTable).values({
-          projectId: projectId,
-          purpose: screen.purpose,
-          screenDescription: screen?.layoutDescription,
-          screenId: screen?.id,
-          screenName: screen?.name,
-        });
-      });
+        for (const screen of JSONAiResult.screens ?? []) {
+          await db.insert(ScreenConfigTable).values({
+            projectId: projectId,
+            purpose: screen.purpose,
+            screenDescription: screen?.layoutDescription,
+            screenId: screen?.id,
+            screenName: screen?.name,
+          });
+        }
       return NextResponse.json(JSONAiResult);
     } else {
       return NextResponse.json(
