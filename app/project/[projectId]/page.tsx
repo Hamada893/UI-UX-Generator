@@ -15,8 +15,11 @@ export default function ProjectCanvasPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('Loading');
   const hasRequestedConfigRef = useRef(false)
+  const hasRequestedUIRef = useRef(false)
 
   useEffect(() => {
+    hasRequestedConfigRef.current = false;
+    hasRequestedUIRef.current = false;
     getProjectDetail();
   }, [projectId]);
 
@@ -37,11 +40,15 @@ export default function ProjectCanvasPage() {
 
   useEffect(() => {
     if (!projectDetail) return;
-    if (screenConfig.length > 0) return;
-    if (hasRequestedConfigRef.current) return;
 
-    hasRequestedConfigRef.current = true;
-    void generateScreenConfig();
+    if (screenConfig.length === 0) {
+      if (hasRequestedConfigRef.current) return;
+      hasRequestedConfigRef.current = true;
+      void generateScreenConfig();
+    } else if (projectDetail && screenConfig && !hasRequestedUIRef.current) {
+      hasRequestedUIRef.current = true;
+      void generateScreenUI();
+    }
   }, [projectDetail, screenConfig.length])
 
   const generateScreenConfig = async () => {
@@ -59,6 +66,29 @@ export default function ProjectCanvasPage() {
       } finally {
         setIsLoading(false);
       }
+  }
+
+  const generateScreenUI = async () => {
+    setIsLoading(true)
+
+    for (let index = 0; index < screenConfig?.length; index++) {
+      const screen = screenConfig[index]
+      if (screen.code) {
+        return;
+      }
+
+      setLoadingMsg(`Generating UI for screen ${index + 1}`);
+      const result = await axios.post('/api/generate-screen-ui', {
+        projectId,
+        screenId: screen?.screenId,
+        screenName: screen?.screenName,
+        purpose: screen?.purpose,
+        screenDescription: screen.screenDescription,
+      })
+      console.log(result?.data);
+    }
+    await getProjectDetail();
+    setIsLoading(false)
   }
 
   return (

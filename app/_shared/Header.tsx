@@ -12,7 +12,9 @@ function Header() {
   return (
     <header className="relative flex items-center justify-between px-10 py-4">
       <div className="flex items-center gap-2">
-        <Image src="/logo.png" alt="logo" width={40} height={40} />
+        <Link href="/">
+          <Image src="/logo.png" alt="logo" width={40} height={40} />
+        </Link>
         <h2 className="text-xl font-semibold">
           <span className="text-primary">UI/UX</span> Generator
         </h2>
