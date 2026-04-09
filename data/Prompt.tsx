@@ -239,6 +239,26 @@ Use CSS variables for base colors
 Hardcoded hex colors ONLY if explicitly requested
 Respect font variables from theme
 NO unnecessary wrapper divs
+
+────────────────────────────────────────
+CANVAS DIMENSIONS (fixed, never override)
+────────────────────────────────────────
+Mobile screens:  500px wide × 1000px tall
+Desktop/Web:     1200px wide × 1000px tall
+
+Root container MUST match exactly:
+  Mobile:  class="relative w-[500px] h-[1000px] overflow-hidden ..."
+  Desktop: class="relative w-[1200px] h-[1000px] overflow-hidden ..."
+
+Rules:
+- NEVER use min-h-screen, 100vw, 100vh, or % widths on the root
+- overflow-hidden on root — content must not bleed outside the canvas
+- If content exceeds 1000px height, use an inner scrollable container:
+    class="absolute inset-0 overflow-y-auto [&::-webkit-scrollbar]:hidden"
+- All layout sections (header, nav, cards) must be sized relative to
+  these fixed dimensions — no fluid/responsive breakpoints needed
+- Bottom navigation on mobile: position absolute bottom-6, not fixed
+  (fixed is relative to viewport, not the canvas frame)
 ────────────────────────────────────────
 FINAL SELF-CHECK BEFORE OUTPUT
 ────────────────────────────────────────

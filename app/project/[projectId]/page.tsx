@@ -107,10 +107,12 @@ export default function ProjectCanvasPage() {
         
         <SettingsSection projectDetail={projectDetail as ProjectDetail} />
 
-        <Canvas 
-          projectDetail={projectDetail as ProjectDetail} 
-          screenConfig={screenConfig as ScreenConfig[]} 
-        />
+        <div className="min-w-0 flex-1">
+          <Canvas
+            projectDetail={projectDetail as ProjectDetail}
+            screenConfig={screenConfig as ScreenConfig[]}
+          />
+        </div>
       </div>
     </div>
   );

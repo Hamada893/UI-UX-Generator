@@ -27,14 +27,14 @@ type Props = {
 function Canvas({ projectDetail, screenConfig, loading }: Props) {
   const [panningEnabled, setPanningEnabled] = useState(true)
   const isMobile = projectDetail?.deviceType === 'mobile'
-  const SCREEN_WIDTH = isMobile ? 400 : 1200
-  const SCREEN_HEIGHT = isMobile ? 800 : 800
+  const SCREEN_WIDTH = isMobile ? 500 : 1200
+  const SCREEN_HEIGHT = isMobile ? 1000 : 1000
   const GAP = isMobile ? 10 : 70
   const innerSkeletonCount = Math.min(Math.max(screenConfig?.length ?? 1, 1), 12)
 
   return (
     <div 
-      className='w-full h-screen bg-grey-100 relative z-0'
+      className='w-full h-screen bg-gray-100 relative z-0'
       
     >
       <DotGrid 
@@ -88,6 +88,12 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
               width: SCREEN_WIDTH,
               height: SCREEN_HEIGHT,
             }}
+            enableResizing={rndResizeHandles}
+            dragHandleClassName="drag-handle"
+            onDragStart={() => setPanningEnabled(false)}
+            onDragStop={() => setPanningEnabled(true)}
+            onResize={() => setPanningEnabled(false)}
+            onResizeStop={() => setPanningEnabled(true)}
           >
             <div className="drag-handle cursor-move bg-white rounded-lg p-4 flex gap-2 items-center">
               <GripVertical className="text-gray-500 h-4 w-4" />

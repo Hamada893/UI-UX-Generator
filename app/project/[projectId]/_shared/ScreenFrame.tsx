@@ -30,11 +30,18 @@ const html = `
 <!-- Tailwind + Iconify -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
-  <style >
+  <style>
     ${themeToCssVars(projectDetail?.theme)}
+    *, *::before, *::after {
+      scrollbar-width: none;        /* Firefox */
+      -ms-overflow-style: none;     /* IE/Edge */
+    }
+    *::-webkit-scrollbar {
+      display: none;                /* Chrome/Safari */
+    }
   </style>
 </head>
-<body class="bg-[var(--background)] text-[var(--foreground)] w-full">
+<body class="bg-[var(--background)] text-[var(--foreground)] w-full overflow-x-hidden">
   ${htmlCode ?? ""}
 </body>
 </html>
@@ -70,7 +77,7 @@ const html = `
       </div>
       <iframe 
         className='w-full h-[calc(100%-40px)] bg-white rounded-2xl mt-3'
-        sandbox='allow-same-origin allow-scripts'
+        sandbox='allow-scripts'
         srcDoc={html}
       />
     </Rnd>
