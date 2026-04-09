@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { ProjectDetail, ScreenConfig } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
+import Canvas from "./_shared/Canvas";
 
 export default function ProjectCanvasPage() {
   const { projectId } = useParams();
@@ -99,15 +100,19 @@ export default function ProjectCanvasPage() {
   return (
     <div>
       <ProjectHeader />
-
-      <div>
-        {isLoading && <div className="absolute p-3 bg-blue-300/20 border-blue-400 border rounded-xl left-1/2 top-20">
+      <div className="relative flex gap-5">
+        {isLoading && <div className="pointer-events-none absolute z-50 left-1/2 top-20 -translate-x-1/2 p-3 bg-blue-300/20 border-blue-400 border rounded-xl shadow-lg">
           <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMsg}</h2>
         </div>}
         
         <SettingsSection projectDetail={projectDetail as ProjectDetail} />
 
-        {/* {Canvas} */}
+        <div className="min-w-0 flex-1">
+          <Canvas
+            projectDetail={projectDetail as ProjectDetail}
+            screenConfig={screenConfig as ScreenConfig[]}
+          />
+        </div>
       </div>
     </div>
   );

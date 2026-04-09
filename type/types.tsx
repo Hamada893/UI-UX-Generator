@@ -19,7 +19,7 @@
   code: string | null,
  }
 
-export type ScreenConfig = {
+export type ScreenType = {
   id: number,
   screenId: string,
   screenName: string,
