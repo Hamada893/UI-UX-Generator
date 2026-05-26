@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useContext, useState } from 'react'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -10,32 +11,25 @@ import axios from 'axios'
 import { toast } from 'sonner'
 
 function ProjectHeader() {
-  const { settingsDetails, setSettingsDetails } = useContext(SettingsContext)
+  const { projectId: urlProjectId } = useParams()
+  const { settingsDetails } = useContext(SettingsContext)
   const [loading, setLoading] = useState(false)
 
   const onSave = async () => {
-    const payload = {
-      theme: settingsDetails?.theme,
-      projectId: settingsDetails?.projectId,
-      projectName: settingsDetails?.projectName,
-    }
-    // #region agent log
-    fetch('http://127.0.0.1:7629/ingest/ef469cf5-8a62-4f7c-b9b9-2f1e881ef921',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'971e07'},body:JSON.stringify({sessionId:'971e07',location:'ProjectHeader.tsx:onSave:entry',message:'save clicked',data:{payload,settingsDetails},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
+    const resolvedProjectId =
+      settingsDetails?.projectId ??
+      (Array.isArray(urlProjectId) ? urlProjectId[0] : urlProjectId)
     try {
       setLoading(true)
-      const result = await axios.put('/api/project', payload)
-      // #region agent log
-      fetch('http://127.0.0.1:7629/ingest/ef469cf5-8a62-4f7c-b9b9-2f1e881ef921',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'971e07'},body:JSON.stringify({sessionId:'971e07',location:'ProjectHeader.tsx:onSave:success',message:'put succeeded',data:{status:result.status,data:result.data},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
-      setLoading(false)
+      await axios.put('/api/project', {
+        theme: settingsDetails?.theme,
+        projectId: resolvedProjectId,
+        projectName: settingsDetails?.projectName,
+      })
       toast.success('Project saved successfully!')
-    } catch (error) {
-      const err = error as { response?: { status?: number; data?: unknown }; message?: string }
-      // #region agent log
-      fetch('http://127.0.0.1:7629/ingest/ef469cf5-8a62-4f7c-b9b9-2f1e881ef921',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'971e07'},body:JSON.stringify({sessionId:'971e07',location:'ProjectHeader.tsx:onSave:error',message:'put failed',data:{status:err.response?.status,responseData:err.response?.data,message:err.message},timestamp:Date.now(),hypothesisId:'B,E'})}).catch(()=>{});
-      // #endregion
+    } catch {
       toast.error('Failed to save project')
+    } finally {
       setLoading(false)
     }
   }

@@ -74,31 +74,34 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const { projectName, theme, projectId } = await req.json();
-    // #region agent log
-    fetch('http://127.0.0.1:7629/ingest/ef469cf5-8a62-4f7c-b9b9-2f1e881ef921',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'971e07'},body:JSON.stringify({sessionId:'971e07',location:'route.tsx:PUT:entry',message:'put handler',data:{projectName,theme,projectId,hasProjectId:!!projectId},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
+
+    if (!projectId) {
+      return NextResponse.json(
+        { error: "projectId is required" },
+        { status: 400 }
+      );
+    }
 
     const result = await db
       .update(ProjectsTable)
       .set({
         projectName: projectName,
         theme: theme,
-        projectId: projectId,
       })
       .where(eq(ProjectsTable.projectId, projectId))
       .returning();
 
-    // #region agent log
-    fetch('http://127.0.0.1:7629/ingest/ef469cf5-8a62-4f7c-b9b9-2f1e881ef921',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'971e07'},body:JSON.stringify({sessionId:'971e07',location:'route.tsx:PUT:afterUpdate',message:'update result',data:{rowCount:result.length,firstRow:result[0]??null},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
+    if (!result.length) {
+      return NextResponse.json(
+        { error: "Project not found" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(result[0]);
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    // #region agent log
-    fetch('http://127.0.0.1:7629/ingest/ef469cf5-8a62-4f7c-b9b9-2f1e881ef921',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'971e07'},body:JSON.stringify({sessionId:'971e07',location:'route.tsx:PUT:catch',message:'put threw',data:{message},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     console.error("[PUT /api/project]", err);
+    const message = err instanceof Error ? err.message : "Internal server error";
     return NextResponse.json(
       { error: "Failed to update project", details: message },
       { status: 500 }

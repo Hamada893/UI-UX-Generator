@@ -25,6 +25,8 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
     setSettingsDetails((prev: { theme?: ThemeKey } | null) => ({
       ...prev,
       theme: themeKey,
+      projectId: projectDetail.projectId,
+      projectName: projectDetail.projectName || '',
     }))
   }, [projectDetail, setSettingsDetails])
 
@@ -46,10 +48,12 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
         <h2 className='text-sm mb-2'>Project Name</h2>
           <Input placeholder='Project Name' 
           value={projectName}
-          onChange={(e) => {setProjectName(e.target?.value || '')
-            setSettingsDetails((prev:any) => ({
+          onChange={(e) => {
+            const name = e.target?.value || ''
+            setProjectName(name)
+            setSettingsDetails((prev: Record<string, unknown> | null) => ({
               ...prev,
-              projectName: projectName
+              projectName: name,
             }))
           }}
         />
