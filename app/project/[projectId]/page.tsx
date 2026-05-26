@@ -34,12 +34,16 @@ export default function ProjectCanvasPage() {
         setProjectDetail(result?.data?.projectDetail);
         setScreenConfig(result?.data?.screenConfig ?? []);
         const theme = result?.data?.projectDetail?.theme
+        const detail = result?.data?.projectDetail
         if (theme) {
           setSettingsDetails((prev: { theme?: string } | null) => ({
             ...prev,
             theme,
           }))
         }
+        // #region agent log
+        fetch('http://127.0.0.1:7629/ingest/ef469cf5-8a62-4f7c-b9b9-2f1e881ef921',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'971e07'},body:JSON.stringify({sessionId:'971e07',location:'page.tsx:getProjectDetail',message:'project loaded',data:{projectId:detail?.projectId,projectName:detail?.projectName,theme,urlProjectId:projectId},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         console.log(result?.data);
       } catch (error) {
         console.error('Failed to fetch project detail', error);

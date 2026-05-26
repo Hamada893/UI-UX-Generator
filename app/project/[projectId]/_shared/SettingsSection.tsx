@@ -46,7 +46,12 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
         <h2 className='text-sm mb-2'>Project Name</h2>
           <Input placeholder='Project Name' 
           value={projectName}
-          onChange={(e) => setProjectName(e.target?.value || '')}
+          onChange={(e) => {setProjectName(e.target?.value || '')
+            setSettingsDetails((prev:any) => ({
+              ...prev,
+              projectName: projectName
+            }))
+          }}
         />
       </div>
 
