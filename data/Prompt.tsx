@@ -65,7 +65,7 @@ PER-SCREEN REQUIREMENTS
 ────────────────────────────────────────
 For EACH screen:
 - id: kebab-case (e.g., "home-dashboard", "workout-tracker")
-- name: human readable
+- name: human readable. Rule: if the name is a noun phrase (e.g. "Task Details", "Home Dashboard"), append " Screen" → "Task Details Screen". If the name is already a verb-led or greeting phrase (e.g. "Welcome to TaskFlow", "Get Started"), leave it unchanged.
 - purpose: one sentence
 - layoutDescription: extremely specific, implementable layout instructions.
 

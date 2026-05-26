@@ -2,8 +2,9 @@ import { GripVertical } from 'lucide-react';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Rnd } from 'react-rnd';
 import { ThemeKey, resolveTheme, themeToCssVars } from '@/data/themes';
-import { ProjectDetail } from '@/type/types';
+import { ProjectDetail, ScreenConfig } from '@/type/types';
 import { SettingsContext } from '@/context/SettingsContext';
+import ScreenHandler from './ScreenHandler';
 
 type Props = {
   x: number,
@@ -13,8 +14,9 @@ type Props = {
   height: number,
   htmlCode: string | undefined,
   projectDetail: ProjectDetail | undefined,
+  screen: ScreenConfig,
 }
-function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, projectDetail }: Props) {
+function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, projectDetail, screen }: Props) {
   const { settingsDetails } = useContext(SettingsContext)
   const themeKey = (settingsDetails?.theme ?? projectDetail?.theme) as ThemeKey | undefined
   const theme = resolveTheme(themeKey)
@@ -156,7 +158,7 @@ useEffect(() => {
       }}
     >
       <div className='drag-handle cursor-move bg-gray-100 p-2 flex gap-2 items-center cursor-move bg-white rounded-lg p-4'>
-        <GripVertical className='text-gray-500 h-4 w-4 '/> Drag here
+        <ScreenHandler screen={screen} />
       </div>
       <iframe 
         ref={iframeRef}
