@@ -31,6 +31,13 @@ OUTPUT JSON SHAPE (TOP LEVEL)
 }
 
 ────────────────────────────────────────
+PROJECT NAME RULES
+────────────────────────────────────────
+- "projectName" must be a short, distinctive product brand (1–3 words) derived ONLY from the user's app idea.
+- Do NOT reuse placeholder or example names from this prompt unless the user explicitly asked for that exact name.
+- Match the domain (finance → finance brand, travel → travel brand, tasks → task/productivity brand, etc.).
+
+────────────────────────────────────────
 SCREEN COUNT RULES
 ────────────────────────────────────────
 - If the user says "one", return exactly 1 screen.
@@ -65,7 +72,7 @@ PER-SCREEN REQUIREMENTS
 ────────────────────────────────────────
 For EACH screen:
 - id: kebab-case (e.g., "home-dashboard", "workout-tracker")
-- name: human readable. Rule: if the name is a noun phrase (e.g. "Task Details", "Home Dashboard"), append " Screen" → "Task Details Screen". If the name is already a verb-led or greeting phrase (e.g. "Welcome to TaskFlow", "Get Started"), leave it unchanged.
+- name: human readable. Rule: if the name is a noun phrase (e.g. "Task Details", "Home Dashboard"), append " Screen" → "Task Details Screen". If the name is already a verb-led or greeting phrase (e.g. "Welcome to Pocket Plan", "Get Started"), leave it unchanged.
 - purpose: one sentence
 - layoutDescription: extremely specific, implementable layout instructions.
 
@@ -125,8 +132,18 @@ Output HTML ONLY — Start with , end at last closing tag
 NO markdown, NO comments, NO explanations
 NO JavaScript, NO canvas — SVG ONLY for charts
 Images rules:
-Avatars → [﻿https://i.pravatar.cc/200](https://i.pravatar.cc/150?u=NAME)
-Other images → searchUnsplash ONLY
+NO <img> tags with broken or made-up URLs — ZERO exceptions
+Avatars → https://i.pravatar.cc/150?u=NAME
+Other images → https://picsum.photos/{width}/{height}?random={unique_number}
+  - Use a different ?random= number for each image (e.g. ?random=1, ?random=2)
+  - Match dimensions to the element (e.g. 400/200 for a banner, 80/80 for a thumbnail)
+  - Example: <img src="https://picsum.photos/400/200?random=3" class="rounded-2xl w-full object-cover" />
+NO background-image CSS with external URLs
+Links & buttons rules:
+ALL <a> tags MUST have href="#" — never a real URL path or route
+ALL <button> tags MUST have no onClick or type="submit"
+This applies even if the element has hover/transition animations — keep the animation, empty the action
+Decorative fills → use SVG shapes or CSS gradients instead
 Theme variables are PREDEFINED by parent — NEVER redeclare
 Use CSS variables for foundational colors ONLY:
 bg-[var(--background)]
@@ -155,7 +172,7 @@ rounded-2xl / rounded-3xl only
 Layered depth:
 shadow-xl / shadow-2xl
 Floating UI elements:
-cards, nav bars, action buttons
+cards, nav bars, action buttons, NEVER ADD SOFT GLOWS TO TEXT
 ────────────────────────────────────────
 LAYOUT RULES (WEB + MOBILE)
 ────────────────────────────────────────

@@ -18,11 +18,20 @@ export default function ProjectCanvasPage() {
   const [loadingMsg, setLoadingMsg] = useState('Loading');
   const hasRequestedConfigRef = useRef(false)
   const hasRequestedUIRef = useRef(false)
-  const { settingsDetails, setSettingsDetails } = useContext(SettingsContext)
+  const { setSettingsDetails } = useContext(SettingsContext)
 
   useEffect(() => {
+    const resolvedProjectId = Array.isArray(projectId) ? projectId[0] : projectId
     hasRequestedConfigRef.current = false;
     hasRequestedUIRef.current = false;
+    setProjectDetail(undefined);
+    setScreenConfig([]);
+    if (resolvedProjectId) {
+      setSettingsDetails({
+        projectId: resolvedProjectId,
+        projectName: '',
+      });
+    }
     getProjectDetail();
   }, [projectId]);
 
@@ -35,12 +44,11 @@ export default function ProjectCanvasPage() {
         setScreenConfig(result?.data?.screenConfig ?? []);
         const detail = result?.data?.projectDetail
         if (detail) {
-          setSettingsDetails((prev: Record<string, unknown> | null) => ({
-            ...prev,
+          setSettingsDetails({
             projectId: detail.projectId,
             projectName: detail.projectName ?? '',
             ...(detail.theme ? { theme: detail.theme } : {}),
-          }))
+          })
         }
         console.log(result?.data);
       } catch (error) {

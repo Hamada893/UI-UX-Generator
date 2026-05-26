@@ -18,17 +18,19 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
   const [userPrompt, setUserPrompt] = useState<string>('')
 
   useEffect(() => {
-    if (!projectDetail) return
-    setProjectName(projectDetail.projectName || '')
+    if (!projectDetail?.projectId) {
+      setProjectName('')
+      return
+    }
+    setProjectName(projectDetail.projectName ?? '')
     const themeKey = normalizeThemeKey(projectDetail.theme)
     setSelectedTheme(themeKey)
-    setSettingsDetails((prev: { theme?: ThemeKey } | null) => ({
-      ...prev,
+    setSettingsDetails({
       theme: themeKey,
       projectId: projectDetail.projectId,
-      projectName: projectDetail.projectName || '',
-    }))
-  }, [projectDetail, setSettingsDetails])
+      projectName: projectDetail.projectName ?? '',
+    })
+  }, [projectDetail?.projectId, projectDetail?.projectName, projectDetail?.theme, setSettingsDetails])
 
   const onThemeSelect = (theme: ThemeKey) => {
     setSelectedTheme(theme)

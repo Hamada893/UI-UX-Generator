@@ -1,4 +1,3 @@
-import { GripVertical } from 'lucide-react';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Rnd } from 'react-rnd';
 import { ThemeKey, resolveTheme, themeToCssVars } from '@/data/themes';
