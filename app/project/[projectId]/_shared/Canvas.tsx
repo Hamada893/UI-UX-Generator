@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pan-pinch";
 import { Rnd } from 'react-rnd';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, ZoomInIcon, ZoomOutIcon, Maximize } from 'lucide-react';
 import DotGrid from '@/components/DotGrid';
 import ScreenFrame from './ScreenFrame';
 import { ProjectDetail, ScreenConfig } from '@/type/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { PlusIcon, MinusIcon, XIcon } from 'lucide-react';
 
 const rndResizeHandles = {
   bottom: true,
@@ -31,6 +33,19 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
   const SCREEN_HEIGHT = isMobile ? 1000 : 1000
   const GAP = isMobile ? 10 : 70
   const innerSkeletonCount = Math.min(Math.max(screenConfig?.length ?? 1, 1), 12)
+
+  const Controls = () => {
+    const { zoomIn, zoomOut, resetTransform } = useControls();
+  
+    return (
+      <div className="tools absolute p-3 px-5 bg-white shadow flex gap-3 rounded-4xl bottom-20 left-1/2 z-30 
+      text-gray-500">
+        <Button onClick={() => zoomIn()}><ZoomInIcon /></Button>
+        <Button onClick={() => zoomOut()}><ZoomOutIcon /></Button>
+        <Button onClick={() => resetTransform()}><Maximize/></Button>
+      </div>
+    );
+  };
 
   return (
     <div 
@@ -67,6 +82,9 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
         doubleClick={{disabled: false}}
         panning={{disabled: !panningEnabled}}
       >
+        {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+        <>
+          <Controls />
         <TransformComponent 
           wrapperStyle={{ width: '100%', height: '100%' }}
         >
@@ -111,6 +129,7 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
           </Rnd>
           ))}
         </TransformComponent>
+        </>)}
       </TransformWrapper>
     </div>
   )
