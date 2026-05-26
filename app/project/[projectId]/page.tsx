@@ -3,11 +3,12 @@
 import ProjectHeader from "./_shared/ProjectHeader";
 import SettingsSection from "./_shared/SettingsSection";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { ProjectDetail, ScreenConfig } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
 import Canvas from "./_shared/Canvas";
+import { SettingsContext } from "@/context/SettingsContext";
 
 export default function ProjectCanvasPage() {
   const { projectId } = useParams();
@@ -17,6 +18,7 @@ export default function ProjectCanvasPage() {
   const [loadingMsg, setLoadingMsg] = useState('Loading');
   const hasRequestedConfigRef = useRef(false)
   const hasRequestedUIRef = useRef(false)
+  const { settingsDetails, setSettingsDetails } = useContext(SettingsContext)
 
   useEffect(() => {
     hasRequestedConfigRef.current = false;
@@ -31,6 +33,13 @@ export default function ProjectCanvasPage() {
         const result = await axios.get(`/api/project?projectId=${projectId}`);
         setProjectDetail(result?.data?.projectDetail);
         setScreenConfig(result?.data?.screenConfig ?? []);
+        const theme = result?.data?.projectDetail?.theme
+        if (theme) {
+          setSettingsDetails((prev: { theme?: string } | null) => ({
+            ...prev,
+            theme,
+          }))
+        }
         console.log(result?.data);
       } catch (error) {
         console.error('Failed to fetch project detail', error);

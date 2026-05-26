@@ -1,10 +1,13 @@
 'use client'
 
+import { SettingsContext } from "@/context/SettingsContext";
 import { UserDetail, UserDetailContext } from "@/context/UserDetailContext";
 import axios from "axios";
 import { type ReactNode, useEffect, useState } from "react"
 
 function Provider({children}: {children: ReactNode}) {
+
+  const [settingsDetails, setSettingsDetails] = useState<any>(null)
 
   const [userDetail, setUserDetail] = useState<UserDetail>(null)
   useEffect(() => {
@@ -22,7 +25,9 @@ function Provider({children}: {children: ReactNode}) {
   }
   return (
     <UserDetailContext.Provider value={{userDetail, setUserDetail}}>
-      {children}
+      <SettingsContext.Provider value={{settingsDetails, setSettingsDetails}}>
+        {children}
+      </SettingsContext.Provider>
     </UserDetailContext.Provider>
   )
 }

@@ -18,7 +18,7 @@ OUTPUT JSON SHAPE (TOP LEVEL)
 ────────────────────────────────────────
 {
   "projectName": string,
-  "theme":string,
+  "theme": string,  // MUST be exactly one key from AVAILABLE THEME STYLES (e.g. "AURORA_INK")
   "projectVisualDescription": string,
   "screens": [
     {
@@ -109,9 +109,11 @@ If existing screens context is provided:
 - Only extend logically; do not redesign from scratch.
 
 ────────────────────────────────────────
-AVAILABLE THEME STYLES
+AVAILABLE THEME STYLES (pick exactly ONE for "theme")
 ────────────────────────────────────────
-${THEME_NAME_LIST}
+${THEME_NAME_LIST.join(", ")}
+
+The "theme" field MUST be one of the exact keys above (UPPER_SNAKE_CASE). Do not invent new theme names.
 `;
 
 export const GENERATE_SCREEN_UI_PROMPT = `

@@ -5,6 +5,7 @@ import { ScreenConfigTable } from "@/config/schema";
 import { db } from "@/config/db";
 import { ProjectsTable } from "@/config/schema";
 import { eq } from "drizzle-orm";
+import { normalizeThemeKey } from "@/data/themes";
 
 const parseAiJson = (raw: string) => {
   const trimmed = raw.trim();
@@ -77,12 +78,13 @@ export async function POST(req: NextRequest) {
     const JSONAiResult = parseAiJson(firstContent);
 
     if (JSONAiResult?.projectVisualDescription && JSONAiResult?.projectName) {
+      const theme = normalizeThemeKey(JSONAiResult?.theme);
       await db
         .update(ProjectsTable)
         .set({
           projectVisualDescription: JSONAiResult?.projectVisualDescription,
           projectName: JSONAiResult?.projectName,
-          theme: JSONAiResult?.theme,
+          theme,
         })
         .where(eq(ProjectsTable.projectId, projectId as string));
 
@@ -95,7 +97,7 @@ export async function POST(req: NextRequest) {
             screenName: screen?.name,
           });
         }
-      return NextResponse.json(JSONAiResult);
+      return NextResponse.json({ ...JSONAiResult, theme });
     } else {
       return NextResponse.json(
         { error: "Failed to generate project config, Internal Server Error" },

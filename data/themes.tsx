@@ -247,7 +247,35 @@ export const THEME_NAME_LIST = [
 export type ThemeKey = keyof typeof THEMES;
 export type Theme = (typeof THEMES)[ThemeKey];
 
-export function themeToCssVars(theme: any) {
+const DEFAULT_THEME_KEY = THEME_NAME_LIST[0];
+
+/** Resolve a DB/AI theme string (or theme object) to a full theme token set. */
+export function resolveTheme(
+    input: ThemeKey | Theme | string | null | undefined
+): Theme {
+    if (input && typeof input === "object" && "background" in input) {
+        return input as Theme;
+    }
+    if (!input) {
+        return THEMES[DEFAULT_THEME_KEY];
+    }
+    const normalized = String(input).trim().toUpperCase().replace(/[\s-]+/g, "_");
+    if (normalized in THEMES) {
+        return THEMES[normalized as ThemeKey];
+    }
+    return THEMES[DEFAULT_THEME_KEY];
+}
+
+export function normalizeThemeKey(
+    input: string | null | undefined
+): ThemeKey {
+    const resolved = resolveTheme(input);
+    const entry = Object.entries(THEMES).find(([, value]) => value === resolved);
+    return (entry?.[0] as ThemeKey) ?? DEFAULT_THEME_KEY;
+}
+
+export function themeToCssVars(themeInput: ThemeKey | Theme | string | null | undefined) {
+    const theme = resolveTheme(themeInput);
     return `
   :root {
     --background: ${theme.background};

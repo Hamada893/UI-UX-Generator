@@ -1,8 +1,9 @@
 import { GripVertical } from 'lucide-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Rnd } from 'react-rnd';
-import { themeToCssVars } from '@/data/themes';
+import { ThemeKey, resolveTheme, themeToCssVars } from '@/data/themes';
 import { ProjectDetail } from '@/type/types';
+import { SettingsContext } from '@/context/SettingsContext';
 
 type Props = {
   x: number,
@@ -14,6 +15,10 @@ type Props = {
   projectDetail: ProjectDetail | undefined,
 }
 function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, projectDetail }: Props) {
+  const { settingsDetails } = useContext(SettingsContext)
+  const themeKey = (settingsDetails?.theme ?? projectDetail?.theme) as ThemeKey | undefined
+  const theme = resolveTheme(themeKey)
+const iframeRef = useRef<HTMLIFrameElement | null>(null);
 const html = `
 <!doctype html>
 <html>
@@ -31,7 +36,7 @@ const html = `
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
   <style>
-    ${themeToCssVars(projectDetail?.theme)}
+    ${themeToCssVars(theme)}
     *, *::before, *::after {
       scrollbar-width: none;        /* Firefox */
       -ms-overflow-style: none;     /* IE/Edge */
@@ -46,7 +51,6 @@ const html = `
 </body>
 </html>
 `;
-const iframeRef = useRef<HTMLIFrameElement | null>(null);
 const [iframeSize, setIframeSize] = useState({ width, height });
 
 useEffect(() => {
