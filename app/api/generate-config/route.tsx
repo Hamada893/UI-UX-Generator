@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     const { openrouter } = await import("@/config/openrouter");
     const aiResponse = await openrouter.chat.send({
       chatRequest: {
-        model: "xiaomi/mimo-v2-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "system",

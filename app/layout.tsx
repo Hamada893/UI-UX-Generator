@@ -10,7 +10,7 @@ const appFont = DM_Sans({
 
 export const metadata: Metadata = {
   title: "UI/UX Mock Generator App",
-  description: "Generate High Quality UI/UX Mocks For Your Projects For Both Mobile and Desktop Devices",
+  description: "Generate High Quality UI/UX Mocks For Your Projects For Mobile Devices",
 };
 
 export default function RootLayout({

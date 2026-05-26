@@ -9,7 +9,7 @@ You MUST return ONLY valid JSON (no markdown, no explanations, no trailing comma
 INPUT
 ────────────────────────────────────────
 You will receive:
-- deviceType: "Mobile" | "Website" 
+- deviceType: "Mobile" 
 - A user request describing the app idea + features
 - (Optional) Existing screens context (if provided, you MUST keep the same patterns, components, and naming style)
 
@@ -34,11 +34,9 @@ OUTPUT JSON SHAPE (TOP LEVEL)
 SCREEN COUNT RULES
 ────────────────────────────────────────
 - If the user says "one", return exactly 1 screen.
-- Otherwise return 1–4 screens ONLY.
+- Otherwise return 1–3 screens ONLY.
 - If {deviceType} is "Mobile" or "Tablet" and user did NOT say "one":
   - Screen 1 MUST be a Welcome / Onboarding screen.
-- If {deviceType} is "Website" or "Desktop":
-  - Do NOT force onboarding unless the user explicitly asks for it.
 
 ────────────────────────────────────────
 PROJECT VISUAL DESCRIPTION (GLOBAL DESIGN SYSTEM)
@@ -47,7 +45,6 @@ Before listing screens, define a complete global UI blueprint inside "projectVis
 It must apply to ALL screens and include:
 - Device type + layout approach:
   - Mobile/Tablet: max width container, safe-area padding, thumb-friendly spacing, optional bottom nav
-  - Website/Desktop: responsive grid, max-width container, header + sidebar or header-only based on app
 - Design style (modern SaaS / fintech / minimal / playful / futuristic — choose appropriately)
 - Theme usage:
   - Use CSS variables style tokens: var(--background), var(--foreground), var(--card), var(--border), var(--primary), var(--muted-foreground), etc.
@@ -102,15 +99,7 @@ A) Mobile/Tablet Navigation
     - Menu → More/Extras
   - IMPORTANT: Do NOT write bottom nav as a lazy copy for every screen. Icons can stay consistent, but the ACTIVE icon MUST change correctly per screen.
 
-B) Website/Desktop Navigation
-- Prefer one of these patterns (choose what fits the app):
-  1) Top header nav (sticky) + optional left sidebar
-  2) Left sidebar nav (collapsible) + top utility header
-- Include explicit navigation details in layoutDescription:
-  - Header height, sticky behavior, search placement, user menu, notifications
-  - Sidebar width, collapsed state, active link styling, section grouping
-  - If a dashboard: include breadcrumb + page title area
-- Use lucide icons for nav items and show active state styling (bg-[var(--muted)] or border-l-2 border-[var(--primary)] etc.)
+
 
 ────────────────────────────────────────
 EXISTING CONTEXT RULE

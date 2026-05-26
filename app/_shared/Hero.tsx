@@ -30,7 +30,7 @@ import  Typewriter  from '@/components/fancy/text/typewriter'
 function Hero() {
 
   const [selectedSuggestion, setSelectedSuggestion] = useState<string>()
-  const [deviceType, setDeviceType] = useState<string>('website')
+  const [deviceType, setDeviceType] = useState<string>('mobile')
   const {user} = useUser()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -106,7 +106,7 @@ function Hero() {
                   deleteSpeed={40}
                   cursorChar={"_"}
                 />
-        <span className='text-primary'>Websites</span> and <span className='text-primary'>Mobile</span> App Designs</h2>
+          <span className='text-primary'>Mobile</span> App Designs</h2>
       <p className='text-center text-gray-600 mt-3 text-lg'>Imagine your idea and turn it into reality.</p>
       
       
@@ -122,13 +122,12 @@ function Hero() {
           <InputGroupAddon align="block-end">
 
           <div suppressHydrationWarning>
-            <Select defaultValue="website" onValueChange={(value) => setDeviceType(value)}>
+            <Select defaultValue="mobile" onValueChange={(value) => setDeviceType(value)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="website">Website</SelectItem>
                   <SelectItem value="mobile">Mobile</SelectItem>
                 </SelectGroup>
               </SelectContent>

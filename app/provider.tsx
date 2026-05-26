@@ -13,7 +13,7 @@ function Provider({children}: {children: ReactNode}) {
 
   const createNewUser = async() => {
     try {
-      const result = await axios.post('/api/user')
+      const result = await axios.post<UserDetail>('/api/user')
       setUserDetail(result.data)
     } catch (error) {
       console.error('Error creating new user', error)
