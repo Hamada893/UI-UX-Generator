@@ -13,12 +13,15 @@ import {
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { toast } from 'sonner'
+import { HtmlWrapper } from '@/data/constant';
 
 type Props = {
   screen: ScreenConfig | undefined,
+  theme: any,
 }
 
-function ScreenHandler({ screen }: Props) {
+function ScreenHandler({ screen, theme }: Props) {
+  const htmlCode = HtmlWrapper(theme, screen?.code as string);
   return (
     <div className='flex justify-between items-center w-full'>
       <div className='flex items-center gap-2'>
@@ -37,7 +40,7 @@ function ScreenHandler({ screen }: Props) {
               <DialogDescription>
                 <div className='flex-1 overflow-y-auto rounded-md border bg-muted p-4'>
                   <SyntaxHighlighter
-                  language="javascript" 
+                  language="html" 
                   style={docco}
                   customStyle={{
                     margin: 0,
@@ -58,10 +61,10 @@ function ScreenHandler({ screen }: Props) {
                     }
                   }}
                   >
-                    {screen?.code ?? 'No code available'}
+                    {htmlCode ?? 'No code available'}
                   </SyntaxHighlighter>
                 </div>
-                  <Button className='mt-5 cursor-pointer' onClick={() => {navigator.clipboard.writeText(screen?.code ?? '' as string)
+                  <Button className='mt-5 cursor-pointer' onClick={() => {navigator.clipboard.writeText(htmlCode ?? '' as string)
                     toast.success('Code copied!')
                   }}><Copy/>Copy</Button>
               </DialogDescription>

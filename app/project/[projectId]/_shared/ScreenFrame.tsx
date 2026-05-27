@@ -4,6 +4,7 @@ import { ThemeKey, resolveTheme, themeToCssVars } from '@/data/themes';
 import { ProjectDetail, ScreenConfig } from '@/type/types';
 import { SettingsContext } from '@/context/SettingsContext';
 import ScreenHandler from './ScreenHandler';
+import { HtmlWrapper } from '@/data/constant';
 
 type Props = {
   x: number,
@@ -19,40 +20,9 @@ function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, project
   const { settingsDetails } = useContext(SettingsContext)
   const themeKey = (settingsDetails?.theme ?? projectDetail?.theme) as ThemeKey | undefined
   const theme = resolveTheme(themeKey)
-const iframeRef = useRef<HTMLIFrameElement | null>(null);
-const html = `
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Google Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-
-<!-- Tailwind + Iconify -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
-  <style>
-    ${themeToCssVars(theme)}
-    *, *::before, *::after {
-      scrollbar-width: none;        /* Firefox */
-      -ms-overflow-style: none;     /* IE/Edge */
-    }
-    *::-webkit-scrollbar {
-      display: none;                /* Chrome/Safari */
-    }
-  </style>
-</head>
-<body class="bg-[var(--background)] text-[var(--foreground)] w-full overflow-x-hidden">
-  ${htmlCode ?? ""}
-</body>
-</html>
-`;
-const [iframeSize, setIframeSize] = useState({ width, height });
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const html = HtmlWrapper(theme, htmlCode as string);
+  const [iframeSize, setIframeSize] = useState({ width, height });
 
 useEffect(() => {
   setIframeSize({ width, height });
@@ -157,7 +127,7 @@ useEffect(() => {
       }}
     >
       <div className='drag-handle cursor-move bg-gray-100 p-2 flex gap-2 items-center cursor-move bg-white rounded-lg p-4'>
-        <ScreenHandler screen={screen} />
+        <ScreenHandler screen={screen} theme={theme} />
       </div>
       <iframe 
         ref={iframeRef}
