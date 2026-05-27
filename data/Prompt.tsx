@@ -41,7 +41,7 @@ PROJECT NAME RULES
 SCREEN COUNT RULES
 ────────────────────────────────────────
 - If the user says "one", return exactly 1 screen.
-- Otherwise return 1–3 screens ONLY.
+- Otherwise return 1–4 screens ONLY.
 - If {deviceType} is "Mobile" or "Tablet" and user did NOT say "one":
   - Screen 1 MUST be a Welcome / Onboarding screen.
 
