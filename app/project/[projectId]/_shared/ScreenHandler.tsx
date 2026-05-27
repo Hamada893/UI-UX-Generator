@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { ScreenConfig } from '@/type/types'
-import { Code2Icon, Copy, GripVertical } from 'lucide-react'
+import { Camera, Code2Icon, Copy, GripVertical } from 'lucide-react'
 import React from 'react'
 import {
   Dialog,
@@ -14,14 +14,48 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { toast } from 'sonner'
 import { HtmlWrapper } from '@/data/constant';
+import html2canvas from 'html2canvas';
 
 type Props = {
   screen: ScreenConfig | undefined,
   theme: any,
+  iframeRef: any,
 }
 
-function ScreenHandler({ screen, theme }: Props) {
+function ScreenHandler({ screen, theme, iframeRef }: Props) {
   const htmlCode = HtmlWrapper(theme, screen?.code as string);
+
+const takeIframeScreenshot = async () => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    try {
+        const doc = iframe.contentDocument;
+        if (!doc) return;
+
+        const body = doc.body;
+
+        // wait one frame to ensure layout is stable
+        await new Promise((res) => requestAnimationFrame(res));
+
+        const canvas = await html2canvas(body, {
+            backgroundColor: null,
+            useCORS: true,
+            scale: window.devicePixelRatio || 1,
+        });
+
+        const image = canvas.toDataURL("image/png");
+
+        // download automatically
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = `${screen?.screenName || "screen"}.png`;
+        link.click();
+    } catch (err) {
+        console.error("Screenshot failed:", err);
+    }
+};
+
   return (
     <div className='flex justify-between items-center w-full'>
       <div className='flex items-center gap-2'>
@@ -29,7 +63,7 @@ function ScreenHandler({ screen, theme }: Props) {
         <h2>{screen?.screenName}</h2>
       </div>
       
-      <div>
+      <div className='flex items-center gap-2'>
         <Dialog>
           <DialogTrigger>
             <Button variant={'outline'}><Code2Icon /></Button>
@@ -71,6 +105,10 @@ function ScreenHandler({ screen, theme }: Props) {
             </DialogHeader>
           </DialogContent>
         </Dialog>
+
+        <Button variant={'outline'} onClick={takeIframeScreenshot}>
+          <Camera />
+        </Button>
       </div>
     </div>
   )

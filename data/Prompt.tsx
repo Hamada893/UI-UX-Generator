@@ -33,7 +33,7 @@ OUTPUT JSON SHAPE (TOP LEVEL)
 ────────────────────────────────────────
 PROJECT NAME RULES
 ────────────────────────────────────────
-- "projectName" must be a short, distinctive product brand (1–3 words) derived ONLY from the user's app idea.
+- "projectName" must be a short, distinctive product brand (1–4 words) derived ONLY from the user's app idea.
 - Do NOT reuse placeholder or example names from this prompt unless the user explicitly asked for that exact name.
 - Match the domain (finance → finance brand, travel → travel brand, tasks → task/productivity brand, etc.).
 
@@ -42,8 +42,8 @@ SCREEN COUNT RULES
 ────────────────────────────────────────
 - If the user says "one", return exactly 1 screen.
 - Otherwise return 1–4 screens ONLY.
-- If {deviceType} is "Mobile" or "Tablet" and user did NOT say "one":
-  - Screen 1 MUST be a Welcome / Onboarding screen.
+- If {deviceType} is "Mobile" and user did NOT say "one":
+  - Screen 1 MUST ALWAYS be a Welcome / Onboarding screen.
 
 ────────────────────────────────────────
 PROJECT VISUAL DESCRIPTION (GLOBAL DESIGN SYSTEM)
@@ -131,13 +131,10 @@ CRITICAL OUTPUT RULES
 Output HTML ONLY — Start with , end at last closing tag
 NO markdown, NO comments, NO explanations
 NO JavaScript, NO canvas — SVG ONLY for charts
+FIRST SCREEN MUST ALWAYS BE A WELCOME / ONBOARDING SCREEN.
 Images rules:
 NO <img> tags with broken or made-up URLs — ZERO exceptions
 Avatars → https://i.pravatar.cc/150?u=NAME
-Other images → https://picsum.photos/{width}/{height}?random={unique_number}
-  - Use a different ?random= number for each image (e.g. ?random=1, ?random=2)
-  - Match dimensions to the element (e.g. 400/200 for a banner, 80/80 for a thumbnail)
-  - Example: <img src="https://picsum.photos/400/200?random=3" class="rounded-2xl w-full object-cover" />
 NO background-image CSS with external URLs
 Links & buttons rules:
 ALL <a> tags MUST have href="#" — never a real URL path or route

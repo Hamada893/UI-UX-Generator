@@ -49,7 +49,7 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
 
   return (
     <div 
-      className='w-full h-screen bg-gray-100 relative z-0'
+      className='w-full h-screen bg-gray-100 relative z-0 '
       
     >
       <DotGrid 
@@ -114,11 +114,11 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
             onResize={() => setPanningEnabled(false)}
             onResizeStop={() => setPanningEnabled(true)}
           >
-            <div className="drag-handle cursor-move bg-white rounded-lg p-4 flex gap-2 items-center">
+            <div className="drag-handle shadow-md cursor-move bg-white rounded-lg p-4 flex gap-2 items-center">
               <GripVertical className="text-gray-500 h-4 w-4" />
               Generating screen…
             </div>
-            <div className="w-full h-[calc(100%-40px)] bg-white rounded-2xl mt-3 p-5 flex flex-row flex-wrap gap-4 content-start items-start">
+            <div className="w-full h-[calc(100%-40px)] bg-white rounded-2xl mt-3 p-5 border border-gray-200  flex flex-row flex-wrap gap-4 content-start items-start">
               {Array.from({ length: innerSkeletonCount }).map((_, si) => (
                 <Skeleton
                   key={si}
