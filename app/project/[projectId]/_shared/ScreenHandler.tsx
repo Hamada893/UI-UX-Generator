@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { ScreenConfig } from '@/type/types'
-import { Camera, Code2Icon, Copy, GripVertical, MoreVertical, Trash } from 'lucide-react'
+import { Camera, Code2Icon, Copy, GripVertical, Loader2, MoreVertical, Sparkle, Trash } from 'lucide-react'
 import axios from 'axios'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,6 @@ import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { toast } from 'sonner'
 import { HtmlWrapper } from '@/data/constant';
 import html2canvas from 'html2canvas';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +26,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { RefreshDataContext } from '@/context/RefreshDataContext'
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Textarea } from '@/components/ui/textarea'
 
 type Props = {
   screen: ScreenConfig | undefined,
@@ -38,6 +46,8 @@ type Props = {
 function ScreenHandler({ screen, theme, iframeRef, projectId }: Props) {
   const htmlCode = HtmlWrapper(theme, screen?.code as string);
   const { refreshData, setRefreshData } = useContext(RefreshDataContext);
+  const [editUserInput, setEditUserInput] = useState<string>();
+  const [loading, setLoading] = useState(false);
 
 const takeIframeScreenshot = async () => {
     const iframe = iframeRef.current;
@@ -74,6 +84,19 @@ const onDelete = async () => {
   const result = await axios.delete(`/api/generate-config?projectId=${projectId}&screenId=${screen?.screenId}`);
   toast.success('Screen Deleted!');
   setRefreshData({method: 'screenConfig', date: Date.now()});
+}
+
+const editScreen = async () => {
+  setLoading(true);
+  const result = await axios.post('/api/edit-screen', {
+    projectId: projectId,
+    screenId: screen?.screenId,
+    userInput: editUserInput,
+    oldCode: screen?.code,
+  });
+  toast.info('Regenerating new screen... !');
+  setRefreshData({method: 'screenConfig', date: Date.now()});
+  setLoading(false);
 }
 
   return (
@@ -130,6 +153,27 @@ const onDelete = async () => {
           <Camera />
         </Button>
 
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline"><Sparkle /></Button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <div>
+              <Textarea 
+                placeholder='Describe the changes you want to make to the screen...' 
+                onChange={(e) => setEditUserInput(e.target?.value || '')} 
+              />
+              <Button 
+                size={'sm'} 
+                className='mt-2 cursor-pointer'
+                onClick={() => editScreen()}
+                disabled={loading}
+              >
+                {loading ? <Loader2 className='animate-spin' /> : <Sparkle />} Regenerate
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
         
         <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -141,6 +185,8 @@ const onDelete = async () => {
             <DropdownMenuItem variant='destructive' onClick={() => onDelete()}><Trash/> Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      
       </div>
     </div>
   )
