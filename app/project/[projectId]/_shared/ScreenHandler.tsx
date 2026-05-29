@@ -108,7 +108,7 @@ const editScreen = async () => {
       
       <div className='flex items-center gap-2'>
         <Dialog>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <Button variant={'outline'}><Code2Icon /></Button>
           </DialogTrigger>
           <DialogContent className='max-w-5xl w-full h-[70vh] flex flex-col'>
