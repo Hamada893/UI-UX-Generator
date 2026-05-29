@@ -40,9 +40,9 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
     return (
       <div className="tools absolute -translate-x-1/2 p-3 px-5 bg-white shadow flex gap-3 rounded-4xl bottom-20 left-[38%] z-30
       text-gray-500">
-        <Button onClick={() => zoomIn()}><ZoomInIcon /></Button>
-        <Button onClick={() => zoomOut()}><ZoomOutIcon /></Button>
-        <Button onClick={() => resetTransform()}><Maximize/></Button>
+        <Button className='cursor-pointer' onClick={() => zoomIn()}><ZoomInIcon /></Button>
+        <Button className='cursor-pointer' onClick={() => zoomOut()}><ZoomOutIcon /></Button>
+        <Button className='cursor-pointer' onClick={() => resetTransform()}><Maximize/></Button>
       </div>
     );
   };
