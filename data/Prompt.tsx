@@ -18,7 +18,7 @@ OUTPUT JSON SHAPE (TOP LEVEL)
 ────────────────────────────────────────
 {
   "projectName": string,
-  "theme":string,
+  "theme": string,  // MUST be exactly one key from AVAILABLE THEME STYLES (e.g. "AURORA_INK")
   "projectVisualDescription": string,
   "screens": [
     {
@@ -31,12 +31,34 @@ OUTPUT JSON SHAPE (TOP LEVEL)
 }
 
 ────────────────────────────────────────
+PROJECT NAME RULES
+────────────────────────────────────────
+- "projectName" must be a short, distinctive product brand (1–4 words) derived ONLY from the user's app idea.
+- Do NOT reuse placeholder or example names from this prompt unless the user explicitly asked for that exact name.
+- Match the domain (finance → finance brand, travel → travel brand, tasks → task/productivity brand, etc.).
+- AVOID overused AI-generated naming patterns such as:
+  - "-ify" suffix (Taskify, Spendify, Trackify)
+  - "-ly" suffix (Spendy, Tracky, Budgety)
+  - "-io" suffix (Finio, Taskio, Budgio)
+  - Compound of domain + "Track/Flow/Hub/App" (FinTrack, TaskFlow, BudgetHub)
+- Instead, draw inspiration from these naming strategies:
+  - Metaphor-based: name after a concept that evokes the feeling of the app
+    (e.g. "Meridian" for a navigation app, "Ember" for a journaling app)
+  - Invented/abstract word: short, punchy, memorable
+    (e.g. "Velo", "Novu", "Kova", "Stryd")
+  - Nature or spatial reference that fits the mood
+    (e.g. "Canopy" for a budgeting app — shelter/safety, "Tide" for a habit app — rhythm)
+  - Uncommon but real word that fits the domain
+    (e.g. "Ledger", "Quorum", "Axiom", "Hearth", "Atlas")
+- The name should feel like it could be a real funded startup, not a hackathon placeholder.
+
+────────────────────────────────────────
 SCREEN COUNT RULES
 ────────────────────────────────────────
 - If the user says "one", return exactly 1 screen.
-- Otherwise return 1–3 screens ONLY.
-- If {deviceType} is "Mobile" or "Tablet" and user did NOT say "one":
-  - Screen 1 MUST be a Welcome / Onboarding screen.
+- Otherwise return 1–4 screens ONLY.
+- If {deviceType} is "Mobile" and user did NOT say "one":
+- Screen 1 MUST ALWAYS be a Welcome / Onboarding screen (from the left side of the canvas, so it needs to be the first generated screen).
 
 ────────────────────────────────────────
 PROJECT VISUAL DESCRIPTION (GLOBAL DESIGN SYSTEM)
@@ -65,7 +87,7 @@ PER-SCREEN REQUIREMENTS
 ────────────────────────────────────────
 For EACH screen:
 - id: kebab-case (e.g., "home-dashboard", "workout-tracker")
-- name: human readable
+- name: human readable. Rule: if the name is a noun phrase (e.g. "Task Details", "Home Dashboard"), append " Screen" → "Task Details Screen". If the name is already a verb-led or greeting phrase (e.g. "Welcome to Pocket Plan", "Get Started"), leave it unchanged.
 - purpose: one sentence
 - layoutDescription: extremely specific, implementable layout instructions.
 
@@ -109,9 +131,11 @@ If existing screens context is provided:
 - Only extend logically; do not redesign from scratch.
 
 ────────────────────────────────────────
-AVAILABLE THEME STYLES
+AVAILABLE THEME STYLES (pick exactly ONE for "theme")
 ────────────────────────────────────────
-${THEME_NAME_LIST}
+${THEME_NAME_LIST.join(", ")}
+
+The "theme" field MUST be one of the exact keys above (UPPER_SNAKE_CASE). Do not invent new theme names.
 `;
 
 export const GENERATE_SCREEN_UI_PROMPT = `
@@ -123,8 +147,14 @@ Output HTML ONLY — Start with , end at last closing tag
 NO markdown, NO comments, NO explanations
 NO JavaScript, NO canvas — SVG ONLY for charts
 Images rules:
-Avatars → [﻿https://i.pravatar.cc/200](https://i.pravatar.cc/150?u=NAME)
-Other images → searchUnsplash ONLY
+NO <img> tags with broken or made-up URLs — ZERO exceptions
+Avatars → https://i.pravatar.cc/150?u=NAME
+NO background-image CSS with external URLs
+Links & buttons rules:
+ALL <a> tags MUST have href="#" — never a real URL path or route
+ALL <button> tags MUST have no onClick or type="submit"
+This applies even if the element has hover/transition animations — keep the animation, empty the action
+Decorative fills → use SVG shapes or CSS gradients instead
 Theme variables are PREDEFINED by parent — NEVER redeclare
 Use CSS variables for foundational colors ONLY:
 bg-[var(--background)]
@@ -153,7 +183,7 @@ rounded-2xl / rounded-3xl only
 Layered depth:
 shadow-xl / shadow-2xl
 Floating UI elements:
-cards, nav bars, action buttons
+cards, nav bars, action buttons, NEVER ADD SOFT GLOWS TO TEXT
 ────────────────────────────────────────
 LAYOUT RULES (WEB + MOBILE)
 ────────────────────────────────────────
@@ -223,7 +253,7 @@ Glassmorphic, sticky if appropriate
 ────────────────────────────────────────
 TAILWIND & CSS RULES
 ────────────────────────────────────────
-Tailwind v3 utilities ONLY
+Tailwind v4 utilities ONLY
 Use CSS variables for base colors
 Hardcoded hex colors ONLY if explicitly requested
 Respect font variables from theme

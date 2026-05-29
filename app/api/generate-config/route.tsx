@@ -4,7 +4,9 @@ import { NextResponse } from "next/server";
 import { ScreenConfigTable } from "@/config/schema";
 import { db } from "@/config/db";
 import { ProjectsTable } from "@/config/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { normalizeThemeKey } from "@/data/themes";
+import { currentUser } from "@clerk/nextjs/server";
 
 const parseAiJson = (raw: string) => {
   const trimmed = raw.trim();
@@ -77,12 +79,13 @@ export async function POST(req: NextRequest) {
     const JSONAiResult = parseAiJson(firstContent);
 
     if (JSONAiResult?.projectVisualDescription && JSONAiResult?.projectName) {
+      const theme = normalizeThemeKey(JSONAiResult?.theme);
       await db
         .update(ProjectsTable)
         .set({
           projectVisualDescription: JSONAiResult?.projectVisualDescription,
           projectName: JSONAiResult?.projectName,
-          theme: JSONAiResult?.theme,
+          theme,
         })
         .where(eq(ProjectsTable.projectId, projectId as string));
 
@@ -95,7 +98,7 @@ export async function POST(req: NextRequest) {
             screenName: screen?.name,
           });
         }
-      return NextResponse.json(JSONAiResult);
+      return NextResponse.json({ ...JSONAiResult, theme });
     } else {
       return NextResponse.json(
         { error: "Failed to generate project config, Internal Server Error" },
@@ -109,4 +112,21 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(req: NextRequest) {
+  const projectId = req.nextUrl.searchParams.get('projectId');
+  const screenId = req.nextUrl.searchParams.get('screenId');
+  const user = await currentUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const result = await db.delete(ScreenConfigTable).where(and(eq(ScreenConfigTable.projectId, projectId as string), eq(ScreenConfigTable.screenId, screenId as string)));
+  if (!result) {
+    return NextResponse.json({ error: "Screen not found or failed to delete" }, { status: 404 });
+  }
+
+  return NextResponse.json({ message: "Screen deleted successfully" });
 }

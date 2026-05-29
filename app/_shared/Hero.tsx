@@ -24,7 +24,6 @@ import { suggestions } from '@/data/constant'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import crypto from 'crypto'
 import  Typewriter  from '@/components/fancy/text/typewriter'
 
 function Hero() {
@@ -34,7 +33,6 @@ function Hero() {
   const {user} = useUser()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const projectId = crypto.randomBytes(16).toString('hex')
 
   const onCreateProject = async () => {
     if (!user) {
@@ -46,6 +44,7 @@ function Hero() {
       return
     }
     setLoading(true)
+    const projectId = crypto.randomUUID()
 
     try {
       const result = await axios.post('/api/project', {
@@ -54,10 +53,11 @@ function Hero() {
         projectId: projectId,
       })
       setLoading(false)
-      if (!projectId) {
+      const createdProjectId = result?.data?.projectId ?? projectId
+      if (!createdProjectId) {
         throw new Error('Project creation succeeded but response is missing projectId')
       }
-      router.push(`/project/${result?.data?.projectId}`)
+      router.push(`/project/${createdProjectId}`)
       
     } catch (error) {
       console.error('Error creating project', error)

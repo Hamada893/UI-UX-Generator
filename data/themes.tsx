@@ -232,22 +232,212 @@ export const THEMES = {
             "#b18cff",
         ],
     },
+
+    // New themes+
+
+    VELVET_NOIR: {
+        background: "#180d1f",
+        foreground: "#f5f0ff",
+
+        card: "#23102f",
+        cardForeground: "#f5f0ff",
+
+        popover: "#23102f",
+        popoverForeground: "#f5f0ff",
+
+        primary: "#e040fb",
+        primaryRgb: "224, 64, 251",
+        primaryForeground: "#180d1f",
+
+        secondary: "#2e1a3d",
+        secondaryForeground: "#f5f0ff",
+
+        muted: "#1e0f2a",
+        mutedForeground: "#c084fc",
+
+        accent: "#b9ff57",
+        accentForeground: "#180d1f",
+
+        destructive: "#ff4d6d",
+
+        border: "#3b1f4f",
+        input: "#3b1f4f",
+        ring: "#e040fb",
+        radius: "0.75rem",
+
+        chart: [
+            "#e040fb",
+            "#b9ff57",
+            "#c084fc",
+            "#38d4f5",
+            "#ff7070",
+        ],
+    },
+
+    SANDSTONE_DUSK: {
+        background: "#fdf6ee",
+        foreground: "#2c1a0e",
+
+        card: "#fff8f0",
+        cardForeground: "#2c1a0e",
+
+        popover: "#fff8f0",
+        popoverForeground: "#2c1a0e",
+
+        primary: "#c05e20",
+        primaryRgb: "192, 94, 32",
+        primaryForeground: "#fff8f0",
+
+        secondary: "#f5e8d8",
+        secondaryForeground: "#2c1a0e",
+
+        muted: "#ede0cc",
+        mutedForeground: "#8a6040",
+
+        accent: "#c97088",
+        accentForeground: "#ffffff",
+
+        destructive: "#c0392b",
+
+        border: "#e8d4bc",
+        input: "#fff8f0",
+        ring: "#c05e20",
+        radius: "0.8rem",
+
+        chart: [
+            "#c05e20",
+            "#c97088",
+            "#b07d50",
+            "#3d8c6a",
+            "#a0522d",
+        ],
+    },
+
+    GLACIER_STEEL: {
+        background: "#0d1519",
+        foreground: "#e8f4f8",
+
+        card: "#131e24",
+        cardForeground: "#e8f4f8",
+
+        popover: "#131e24",
+        popoverForeground: "#e8f4f8",
+
+        primary: "#38d4f5",
+        primaryRgb: "56, 212, 245",
+        primaryForeground: "#0d1519",
+
+        secondary: "#1a2d38",
+        secondaryForeground: "#e8f4f8",
+
+        muted: "#111c24",
+        mutedForeground: "#7ab8d4",
+
+        accent: "#4f9ecf",
+        accentForeground: "#0d1519",
+
+        destructive: "#ff4b5c",
+
+        border: "#1f3040",
+        input: "#1f3040",
+        ring: "#38d4f5",
+        radius: "0.65rem",
+
+        chart: [
+            "#38d4f5",
+            "#4f9ecf",
+            "#7ab8d4",
+            "#5ce0b8",
+            "#a78bfa",
+        ],
+    },
+
+    EMBER_PROTOCOL: {
+        background: "#0e0b08",
+        foreground: "#fff0e0",
+
+        card: "#18120a",
+        cardForeground: "#fff0e0",
+
+        popover: "#18120a",
+        popoverForeground: "#fff0e0",
+
+        primary: "#ff7830",
+        primaryRgb: "255, 120, 48",
+        primaryForeground: "#0e0b08",
+
+        secondary: "#241808",
+        secondaryForeground: "#fff0e0",
+
+        muted: "#1a1008",
+        mutedForeground: "#b87040",
+
+        accent: "#ffd060",
+        accentForeground: "#0e0b08",
+
+        destructive: "#ff3b3b",
+
+        border: "#2e1f0a",
+        input: "#2e1f0a",
+        ring: "#ff7830",
+        radius: "0.55rem",
+
+        chart: [
+            "#ff7830",
+            "#ffd060",
+            "#e06030",
+            "#ff4d4d",
+            "#c8a840",
+        ],
+    },
 } as const;
 
 
 export const THEME_NAME_LIST = [
     "AURORA_INK",
-    "DUSTY_ORCHID",
-    "CITRUS_SLATE",
+    "GLACIER_STEEL",
+    "EMBER_PROTOCOL",
     "MOSS_PARCHMENT",
     "POLAR_MINT",
     "OBSIDIAN_BLOOM",
+    "VELVET_NOIR",
+    "SANDSTONE_DUSK",
+    "DUSTY_ORCHID",
+    "CITRUS_SLATE",
   ] as const;
 
 export type ThemeKey = keyof typeof THEMES;
 export type Theme = (typeof THEMES)[ThemeKey];
 
-export function themeToCssVars(theme: any) {
+const DEFAULT_THEME_KEY = THEME_NAME_LIST[0];
+
+/** Resolve a DB/AI theme string (or theme object) to a full theme token set. */
+export function resolveTheme(
+    input: ThemeKey | Theme | string | null | undefined
+): Theme {
+    if (input && typeof input === "object" && "background" in input) {
+        return input as Theme;
+    }
+    if (!input) {
+        return THEMES[DEFAULT_THEME_KEY];
+    }
+    const normalized = String(input).trim().toUpperCase().replace(/[\s-]+/g, "_");
+    if (normalized in THEMES) {
+        return THEMES[normalized as ThemeKey];
+    }
+    return THEMES[DEFAULT_THEME_KEY];
+}
+
+export function normalizeThemeKey(
+    input: string | null | undefined
+): ThemeKey {
+    const resolved = resolveTheme(input);
+    const entry = Object.entries(THEMES).find(([, value]) => value === resolved);
+    return (entry?.[0] as ThemeKey) ?? DEFAULT_THEME_KEY;
+}
+
+export function themeToCssVars(themeInput: ThemeKey | Theme | string | null | undefined) {
+    const theme = resolveTheme(themeInput);
     return `
   :root {
     --background: ${theme.background};

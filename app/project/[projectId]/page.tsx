@@ -3,11 +3,13 @@
 import ProjectHeader from "./_shared/ProjectHeader";
 import SettingsSection from "./_shared/SettingsSection";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { ProjectDetail, ScreenConfig } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
 import Canvas from "./_shared/Canvas";
+import { SettingsContext } from "@/context/SettingsContext";
+import { RefreshDataContext } from "@/context/RefreshDataContext";
 
 export default function ProjectCanvasPage() {
   const { projectId } = useParams();
@@ -17,12 +19,29 @@ export default function ProjectCanvasPage() {
   const [loadingMsg, setLoadingMsg] = useState('Loading');
   const hasRequestedConfigRef = useRef(false)
   const hasRequestedUIRef = useRef(false)
+  const { setSettingsDetails } = useContext(SettingsContext)
+  const { refreshData, setRefreshData } = useContext(RefreshDataContext);
 
   useEffect(() => {
+    const resolvedProjectId = Array.isArray(projectId) ? projectId[0] : projectId
     hasRequestedConfigRef.current = false;
     hasRequestedUIRef.current = false;
+    setProjectDetail(undefined);
+    setScreenConfig([]);
+    if (resolvedProjectId) {
+      setSettingsDetails({
+        projectId: resolvedProjectId,
+        projectName: '',
+      });
+    }
     getProjectDetail();
   }, [projectId]);
+
+  useEffect(() => {
+    if (refreshData?.method === 'screenConfig') {
+      getProjectDetail()
+    }
+  }, [refreshData])
 
   const getProjectDetail = async () => {
     try {
@@ -31,6 +50,14 @@ export default function ProjectCanvasPage() {
         const result = await axios.get(`/api/project?projectId=${projectId}`);
         setProjectDetail(result?.data?.projectDetail);
         setScreenConfig(result?.data?.screenConfig ?? []);
+        const detail = result?.data?.projectDetail
+        if (detail) {
+          setSettingsDetails({
+            projectId: detail.projectId,
+            projectName: detail.projectName ?? '',
+            ...(detail.theme ? { theme: detail.theme } : {}),
+          })
+        }
         console.log(result?.data);
       } catch (error) {
         console.error('Failed to fetch project detail', error);
@@ -99,7 +126,9 @@ export default function ProjectCanvasPage() {
 
   return (
     <div>
+      <div className="sticky top-0 z-50 bg-white">
       <ProjectHeader />
+      </div>
       <div className="relative flex gap-5">
         {isLoading && <div className="pointer-events-none absolute z-50 left-1/2 top-20 -translate-x-1/2 p-3 bg-blue-300/20 border-blue-400 border rounded-xl shadow-lg">
           <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMsg}</h2>

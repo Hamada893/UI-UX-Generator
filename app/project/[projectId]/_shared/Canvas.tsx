@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent, useControls } from "react-zoom-pan-pinch";
 import { Rnd } from 'react-rnd';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, ZoomInIcon, ZoomOutIcon, Maximize } from 'lucide-react';
 import DotGrid from '@/components/DotGrid';
 import ScreenFrame from './ScreenFrame';
 import { ProjectDetail, ScreenConfig } from '@/type/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { PlusIcon, MinusIcon, XIcon } from 'lucide-react';
 
 const rndResizeHandles = {
   bottom: true,
@@ -32,9 +34,22 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
   const GAP = isMobile ? 10 : 70
   const innerSkeletonCount = Math.min(Math.max(screenConfig?.length ?? 1, 1), 12)
 
+  const Controls = () => {
+    const { zoomIn, zoomOut, resetTransform } = useControls();
+  
+    return (
+      <div className="tools fixed p-3 px-5 bg-white shadow flex gap-3 rounded-4xl bottom-5 left-1/2 -translate-x-1/2 z-30
+      text-gray-500">
+        <Button className='cursor-pointer' onClick={() => zoomIn()}><ZoomInIcon /></Button>
+        <Button className='cursor-pointer' onClick={() => zoomOut()}><ZoomOutIcon /></Button>
+        <Button className='cursor-pointer' onClick={() => resetTransform()}><Maximize/></Button>
+      </div>
+    );
+  };
+
   return (
     <div 
-      className='w-full h-screen bg-gray-100 relative z-0'
+      className='w-full h-screen bg-gray-100 relative z-0 '
       
     >
       <DotGrid 
@@ -67,6 +82,9 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
         doubleClick={{disabled: false}}
         panning={{disabled: !panningEnabled}}
       >
+        {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+        <>
+          <Controls />
         <TransformComponent 
           wrapperStyle={{ width: '100%', height: '100%' }}
         >
@@ -80,6 +98,7 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
             setPanningEnabled={setPanningEnabled}
             htmlCode={screen?.code ?? ''}
             projectDetail={projectDetail}
+            screen={screen}
           /> : <Rnd
             key={screen.screenId ?? `sk-${index}`}
             default={{
@@ -95,11 +114,11 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
             onResize={() => setPanningEnabled(false)}
             onResizeStop={() => setPanningEnabled(true)}
           >
-            <div className="drag-handle cursor-move bg-white rounded-lg p-4 flex gap-2 items-center">
+            <div className="drag-handle shadow-md cursor-move bg-white rounded-lg p-4 flex gap-2 items-center">
               <GripVertical className="text-gray-500 h-4 w-4" />
               Generating screen…
             </div>
-            <div className="w-full h-[calc(100%-40px)] bg-white rounded-2xl mt-3 p-5 flex flex-row flex-wrap gap-4 content-start items-start">
+            <div className="w-full h-[calc(100%-40px)] bg-white rounded-2xl mt-3 p-5 border border-gray-200  flex flex-row flex-wrap gap-4 content-start items-start">
               {Array.from({ length: innerSkeletonCount }).map((_, si) => (
                 <Skeleton
                   key={si}
@@ -111,6 +130,7 @@ function Canvas({ projectDetail, screenConfig, loading }: Props) {
           </Rnd>
           ))}
         </TransformComponent>
+        </>)}
       </TransformWrapper>
     </div>
   )

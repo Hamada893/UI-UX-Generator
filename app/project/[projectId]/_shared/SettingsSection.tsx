@@ -1,24 +1,44 @@
 'use client'
 
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Camera, Share, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { THEME_NAME_LIST, ThemeKey, THEMES } from '@/data/themes'
+import { THEME_NAME_LIST, ThemeKey, THEMES, normalizeThemeKey } from '@/data/themes'
 import { ProjectDetail } from '@/type/types'
 import { useEffect } from 'react'
-
+import { SettingsContext } from '@/context/SettingsContext'
 
 function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
 
+  const { settingsDetails, setSettingsDetails } = useContext(SettingsContext)
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey>(THEME_NAME_LIST[0])
   const [projectName, setProjectName] = useState<string>(projectDetail?.projectName || '')
   const [userPrompt, setUserPrompt] = useState<string>('')
 
   useEffect(() => {
-    projectDetail && setProjectName(projectDetail?.projectName || '')
-  }, [projectDetail])
+    if (!projectDetail?.projectId) {
+      setProjectName('')
+      return
+    }
+    setProjectName(projectDetail.projectName ?? '')
+    const themeKey = normalizeThemeKey(projectDetail.theme)
+    setSelectedTheme(themeKey)
+    setSettingsDetails({
+      theme: themeKey,
+      projectId: projectDetail.projectId,
+      projectName: projectDetail.projectName ?? '',
+    })
+  }, [projectDetail?.projectId, projectDetail?.projectName, projectDetail?.theme, setSettingsDetails])
+
+  const onThemeSelect = (theme: ThemeKey) => {
+    setSelectedTheme(theme)
+    setSettingsDetails((prev:any) => ({
+      ...prev,
+      theme: theme
+    }))
+  }
 
   return (
     <div className='w-[300px] h-[90vh] p-5 border-r'>
@@ -30,7 +50,14 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
         <h2 className='text-sm mb-2'>Project Name</h2>
           <Input placeholder='Project Name' 
           value={projectName}
-          onChange={(e) => setProjectName(e.target?.value || '')}
+          onChange={(e) => {
+            const name = e.target?.value || ''
+            setProjectName(name)
+            setSettingsDetails((prev: Record<string, unknown> | null) => ({
+              ...prev,
+              projectName: name,
+            }))
+          }}
         />
       </div>
 
@@ -50,7 +77,7 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
               className={`w-full p-3 border rounded-xl mb-2 cursor-pointer
                 ${selectedTheme === theme ? 'border-primary bg-primary/10' : ''}
               `} 
-              onClick={() => setSelectedTheme(theme)}
+              onClick={() => onThemeSelect(theme)}
             >
               <h2>{theme}</h2>
               <div className='flex gap-2 justify-center items-center'>

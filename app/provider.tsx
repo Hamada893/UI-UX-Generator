@@ -1,10 +1,15 @@
 'use client'
 
+import { RefreshDataContext } from "@/context/RefreshDataContext";
+import { SettingsContext } from "@/context/SettingsContext";
 import { UserDetail, UserDetailContext } from "@/context/UserDetailContext";
 import axios from "axios";
 import { type ReactNode, useEffect, useState } from "react"
 
 function Provider({children}: {children: ReactNode}) {
+
+  const [settingsDetails, setSettingsDetails] = useState<any>(null)
+  const [refreshData, setRefreshData] = useState();
 
   const [userDetail, setUserDetail] = useState<UserDetail>(null)
   useEffect(() => {
@@ -22,7 +27,11 @@ function Provider({children}: {children: ReactNode}) {
   }
   return (
     <UserDetailContext.Provider value={{userDetail, setUserDetail}}>
-      {children}
+      <SettingsContext.Provider value={{settingsDetails, setSettingsDetails}}>
+        <RefreshDataContext.Provider value={{refreshData, setRefreshData}}>
+        {children}
+        </RefreshDataContext.Provider>
+      </SettingsContext.Provider>
     </UserDetailContext.Provider>
   )
 }

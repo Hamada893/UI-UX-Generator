@@ -1,8 +1,10 @@
-import { GripVertical } from 'lucide-react';
-import React from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Rnd } from 'react-rnd';
-import { themeToCssVars } from '@/data/themes';
-import { ProjectDetail } from '@/type/types';
+import { ThemeKey, resolveTheme } from '@/data/themes';
+import { ProjectDetail, ScreenConfig } from '@/type/types';
+import { SettingsContext } from '@/context/SettingsContext';
+import ScreenHandler from './ScreenHandler';
+import { HtmlWrapper } from '@/data/constant';
 
 type Props = {
   x: number,
@@ -12,40 +14,72 @@ type Props = {
   height: number,
   htmlCode: string | undefined,
   projectDetail: ProjectDetail | undefined,
+  screen: ScreenConfig,
 }
-function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, projectDetail }: Props) {
-const html = `
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Google Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, projectDetail, screen }: Props) {
+  const { settingsDetails } = useContext(SettingsContext)
+  const themeKey = (settingsDetails?.theme ?? projectDetail?.theme) as ThemeKey | undefined
+  const theme = resolveTheme(themeKey)
+  const frameIdRef = useRef(`frame-${Math.random().toString(36).slice(2, 10)}`);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const html = HtmlWrapper(theme, htmlCode as string);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [iframeSize, setIframeSize] = useState({ width, height });
+  const instrumentedHtml = `
+  ${html.replace(
+    /<\/body>(?![\s\S]*<\/body>)/,
+      `<script>
+        (() => {
+          const frameId = ${JSON.stringify(frameIdRef.current)};
+          const sendHeight = () => {
+            const htmlEl = document.documentElement;
+            const body = document.body;
+            if (!htmlEl || !body) return;
+            htmlEl.style.overflowY = 'hidden';
+            body.style.overflowY = 'hidden';
+            const contentHeight = Math.max(
+              htmlEl.scrollHeight || 0,
+              body.scrollHeight || 0,
+              htmlEl.offsetHeight || 0,
+              body.offsetHeight || 0
+            );
+            parent.postMessage({
+              source: 'uiux-frame-height',
+              frameId,
+              height: contentHeight
+            }, '*');
+          };
+          window.addEventListener('load', sendHeight);
+          window.addEventListener('resize', sendHeight);
+          new MutationObserver(sendHeight).observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
+          if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(sendHeight).catch(() => {});
+          }
+          sendHeight();
+        })();
+      <\/script></body>`
+    )}
+  `;
 
+useEffect(() => {
+  setIframeSize({ width, height });
+}, [width, height]);
+useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      const payload = event.data as {
+        source?: string
+        frameId?: string
+        height?: number
+      } | null;
+      if (!payload || payload.source !== 'uiux-frame-height' || payload.frameId !== frameIdRef.current) return;
+      const headerHeight = headerRef.current?.offsetHeight ?? 0;
+      const next = Math.min(Math.max((payload.height ?? 0) + headerHeight + 12, 160), 4000);
+      setIframeSize((s) => (Math.abs(s.height - next) > 2 ? { ...s, height: next } : s));
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+}, []);
 
-<!-- Tailwind + Iconify -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
-  <style>
-    ${themeToCssVars(projectDetail?.theme)}
-    *, *::before, *::after {
-      scrollbar-width: none;        /* Firefox */
-      -ms-overflow-style: none;     /* IE/Edge */
-    }
-    *::-webkit-scrollbar {
-      display: none;                /* Chrome/Safari */
-    }
-  </style>
-</head>
-<body class="bg-[var(--background)] text-[var(--foreground)] w-full overflow-x-hidden">
-  ${htmlCode ?? ""}
-</body>
-</html>
-`;
 
   
   return (
@@ -56,6 +90,7 @@ const html = `
         width: width,
         height: height,
       }}
+      size={iframeSize}
       dragHandleClassName='drag-handle'
       enableResizing={{
         bottom: true,
@@ -70,16 +105,21 @@ const html = `
       onDragStart={() => setPanningEnabled(false)}
       onDragStop={() => setPanningEnabled(true)}
       onResize={() => setPanningEnabled(false)}
-      onResizeStop={() => setPanningEnabled(true)}
+      onResizeStop={(_,__,ref) => {setPanningEnabled(true);
+        setIframeSize({ width: ref.offsetWidth, height: ref.offsetHeight });
+      }}
     >
-      <div className='drag-handle cursor-move bg-gray-100 p-2 flex gap-2 items-center cursor-move bg-white rounded-lg p-4'>
-        <GripVertical className='text-gray-500 h-4 w-4 '/> Drag here
+      <div className='h-full flex flex-col'>
+        <div ref={headerRef} className='drag-handle cursor-move bg-gray-100 p-2 flex gap-2 items-center cursor-move bg-white rounded-lg p-4'>
+          <ScreenHandler screen={screen} theme={theme} iframeRef={iframeRef} projectId={projectDetail?.projectId}/>
+        </div>
+        <iframe 
+          ref={iframeRef}
+          className='w-full flex-1 min-h-0 bg-white rounded-2xl mt-3'
+          sandbox='allow-scripts allow-same-origin'
+          srcDoc={instrumentedHtml}
+        />
       </div>
-      <iframe 
-        className='w-full h-[calc(100%-40px)] bg-white rounded-2xl mt-3'
-        sandbox='allow-scripts'
-        srcDoc={html}
-      />
     </Rnd>
   )
 }

@@ -70,3 +70,45 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+export async function PUT(req: NextRequest) {
+  try {
+    const { projectName, theme, projectId } = await req.json();
+    const user = await currentUser();
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!user || !email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!projectId) {
+      return NextResponse.json(
+        { error: "projectId is required" },
+        { status: 400 }
+      );
+    }
+
+    const result = await db
+      .update(ProjectsTable)
+      .set({
+        projectName: projectName,
+        theme: theme,
+      })
+      .where(and(eq(ProjectsTable.projectId, projectId), eq(ProjectsTable.userId, email)))
+      .returning();
+
+    if (!result.length) {
+      return NextResponse.json(
+        { error: "Project not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(result[0]);
+  } catch (err) {
+    console.error("[PUT /api/project]", err);
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return NextResponse.json(
+      { error: "Failed to update project", details: message },
+      { status: 500 }
+    );
+  }
+}
