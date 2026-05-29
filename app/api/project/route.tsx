@@ -74,7 +74,11 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const { projectName, theme, projectId } = await req.json();
-
+    const user = await currentUser();
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!user || !email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     if (!projectId) {
       return NextResponse.json(
         { error: "projectId is required" },
@@ -88,7 +92,7 @@ export async function PUT(req: NextRequest) {
         projectName: projectName,
         theme: theme,
       })
-      .where(eq(ProjectsTable.projectId, projectId))
+      .where(and(eq(ProjectsTable.projectId, projectId), eq(ProjectsTable.userId, email)))
       .returning();
 
     if (!result.length) {

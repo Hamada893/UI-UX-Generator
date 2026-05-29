@@ -81,23 +81,38 @@ const takeIframeScreenshot = async () => {
 };
 
 const onDelete = async () => {
-  const result = await axios.delete(`/api/generate-config?projectId=${projectId}&screenId=${screen?.screenId}`);
-  toast.success('Screen Deleted!');
-  setRefreshData({method: 'screenConfig', date: Date.now()});
+  try {
+    setLoading(true);
+    toast.info('Deleting screen... !');
+    await axios.delete(`/api/generate-config?projectId=${projectId}&screenId=${screen?.screenId}`);
+    toast.success('Screen Deleted!');
+    setRefreshData({ method: 'screenConfig', date: Date.now() });
+  } catch (err) {
+    console.error('Failed to delete screen', err);
+    toast.error('Failed to delete screen');
+  } finally {
+    setLoading(false);
+    }
 }
 
 const editScreen = async () => {
   setLoading(true);
   toast.info('Regenerating new screen... !');
-  const result = await axios.post('/api/edit-screen', {
-    projectId: projectId,
-    screenId: screen?.screenId,
-    userInput: editUserInput,
-    oldCode: screen?.code,
-  });
-  toast.success('Screen regenerated successfully!')
-  setRefreshData({method: 'screenConfig', date: Date.now()});
-  setLoading(false);
+  try {
+    await axios.post('/api/edit-screen', {
+      projectId: projectId,
+      screenId: screen?.screenId,
+      userInput: editUserInput,
+      oldCode: screen?.code,
+    });
+    toast.success('Screen regenerated successfully!');
+    setRefreshData({ method: 'screenConfig', date: Date.now() });
+  } catch (err) {
+    console.error('Failed to regenerate screen', err);
+    toast.error('Failed to regenerate screen');
+  } finally {
+    setLoading(false);
+  }
 }
 
   return (
