@@ -3,10 +3,22 @@ import { openrouter } from "@/config/openrouter";
 import { db } from "@/config/db";
 import { ScreenConfigTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
+import { currentUser } from "@clerk/nextjs/server";
 
 
 export async function POST(req: NextRequest) {
     const { projectId, screenId, oldCode, userInput } = await req.json();
+    const user = await currentUser();
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!user || !email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!projectId || !screenId || !userInput) {
+      return NextResponse.json(
+        { error: "Invalid request payload: missing projectId, screenId, or userInput" },
+        { status: 400 }
+      );
+    }
     const USER_INPUT = `
         ${oldCode} + Make as per user input, keeping design, structure and styling the same, do not change it.
         Make only the changes requested by the user, do not change the design, structure and styling.
@@ -41,6 +53,10 @@ export async function POST(req: NextRequest) {
           code: code as string,
         }).where(and(eq(ScreenConfigTable.projectId, projectId as string), eq(ScreenConfigTable.screenId, screenId as string)))
         .returning();
+
+        if (!updateResult.length) {
+          return NextResponse.json({ error: 'Screen not found' }, { status: 404 })
+        }
       
         return NextResponse.json(updateResult[0]);
       } catch (error) {

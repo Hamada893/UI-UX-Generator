@@ -24,7 +24,6 @@ import { suggestions } from '@/data/constant'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import crypto from 'crypto'
 import  Typewriter  from '@/components/fancy/text/typewriter'
 
 function Hero() {
@@ -45,7 +44,7 @@ function Hero() {
       return
     }
     setLoading(true)
-    const projectId = crypto.randomBytes(16).toString('hex')
+    const projectId = crypto.randomUUID()
 
     try {
       const result = await axios.post('/api/project', {

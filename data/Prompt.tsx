@@ -58,7 +58,7 @@ SCREEN COUNT RULES
 - If the user says "one", return exactly 1 screen.
 - Otherwise return 1–4 screens ONLY.
 - If {deviceType} is "Mobile" and user did NOT say "one":
-  - Screen 1 MUST ALWAYS be a Welcome / Onboarding screen.
+- Screen 1 MUST ALWAYS be a Welcome / Onboarding screen (from the left side of the canvas, so it needs to be the first generated screen).
 
 ────────────────────────────────────────
 PROJECT VISUAL DESCRIPTION (GLOBAL DESIGN SYSTEM)
@@ -146,7 +146,6 @@ CRITICAL OUTPUT RULES
 Output HTML ONLY — Start with , end at last closing tag
 NO markdown, NO comments, NO explanations
 NO JavaScript, NO canvas — SVG ONLY for charts
-FIRST SCREEN MUST ALWAYS BE A WELCOME / ONBOARDING SCREEN.
 Images rules:
 NO <img> tags with broken or made-up URLs — ZERO exceptions
 Avatars → https://i.pravatar.cc/150?u=NAME
@@ -254,7 +253,7 @@ Glassmorphic, sticky if appropriate
 ────────────────────────────────────────
 TAILWIND & CSS RULES
 ────────────────────────────────────────
-Tailwind v3 utilities ONLY
+Tailwind v4 utilities ONLY
 Use CSS variables for base colors
 Hardcoded hex colors ONLY if explicitly requested
 Respect font variables from theme

@@ -26,8 +26,8 @@ function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, project
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [iframeSize, setIframeSize] = useState({ width, height });
   const instrumentedHtml = `
-    ${html.replace(
-      '</body>',
+  ${html.replace(
+    /<\/body>(?![\s\S]*<\/body>)/,
       `<script>
         (() => {
           const frameId = ${JSON.stringify(frameIdRef.current)};
