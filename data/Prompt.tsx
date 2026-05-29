@@ -36,6 +36,21 @@ PROJECT NAME RULES
 - "projectName" must be a short, distinctive product brand (1–4 words) derived ONLY from the user's app idea.
 - Do NOT reuse placeholder or example names from this prompt unless the user explicitly asked for that exact name.
 - Match the domain (finance → finance brand, travel → travel brand, tasks → task/productivity brand, etc.).
+- AVOID overused AI-generated naming patterns such as:
+  - "-ify" suffix (Taskify, Spendify, Trackify)
+  - "-ly" suffix (Spendy, Tracky, Budgety)
+  - "-io" suffix (Finio, Taskio, Budgio)
+  - Compound of domain + "Track/Flow/Hub/App" (FinTrack, TaskFlow, BudgetHub)
+- Instead, draw inspiration from these naming strategies:
+  - Metaphor-based: name after a concept that evokes the feeling of the app
+    (e.g. "Meridian" for a navigation app, "Ember" for a journaling app)
+  - Invented/abstract word: short, punchy, memorable
+    (e.g. "Velo", "Novu", "Kova", "Stryd")
+  - Nature or spatial reference that fits the mood
+    (e.g. "Canopy" for a budgeting app — shelter/safety, "Tide" for a habit app — rhythm)
+  - Uncommon but real word that fits the domain
+    (e.g. "Ledger", "Quorum", "Axiom", "Hearth", "Atlas")
+- The name should feel like it could be a real funded startup, not a hackathon placeholder.
 
 ────────────────────────────────────────
 SCREEN COUNT RULES
