@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { ScreenConfig } from '@/type/types'
-import { Camera, Code2Icon, Copy, GripVertical } from 'lucide-react'
-import React from 'react'
+import { Camera, Code2Icon, Copy, GripVertical, MoreVertical, Trash } from 'lucide-react'
+import axios from 'axios'
+import React, { useContext } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -16,14 +17,27 @@ import { toast } from 'sonner'
 import { HtmlWrapper } from '@/data/constant';
 import html2canvas from 'html2canvas';
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { RefreshDataContext } from '@/context/RefreshDataContext'
+
 type Props = {
   screen: ScreenConfig | undefined,
   theme: any,
   iframeRef: any,
+  projectId: string | undefined,
 }
 
-function ScreenHandler({ screen, theme, iframeRef }: Props) {
+function ScreenHandler({ screen, theme, iframeRef, projectId }: Props) {
   const htmlCode = HtmlWrapper(theme, screen?.code as string);
+  const { refreshData, setRefreshData } = useContext(RefreshDataContext);
 
 const takeIframeScreenshot = async () => {
     const iframe = iframeRef.current;
@@ -55,6 +69,12 @@ const takeIframeScreenshot = async () => {
         console.error("Screenshot failed:", err);
     }
 };
+
+const onDelete = async () => {
+  const result = await axios.delete(`/api/generate-config?projectId=${projectId}&screenId=${screen?.screenId}`);
+  toast.success('Screen Deleted!');
+  setRefreshData({method: 'screenConfig', date: Date.now()});
+}
 
   return (
     <div className='flex justify-between items-center w-full'>
@@ -109,6 +129,18 @@ const takeIframeScreenshot = async () => {
         <Button variant={'outline'} onClick={takeIframeScreenshot}>
           <Camera />
         </Button>
+
+        
+        <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost">
+            <MoreVertical />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+            <DropdownMenuItem variant='destructive' onClick={() => onDelete()}><Trash/> Delete</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       </div>
     </div>
   )

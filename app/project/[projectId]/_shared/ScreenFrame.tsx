@@ -111,7 +111,7 @@ useEffect(() => {
     >
       <div className='h-full flex flex-col'>
         <div ref={headerRef} className='drag-handle cursor-move bg-gray-100 p-2 flex gap-2 items-center cursor-move bg-white rounded-lg p-4'>
-          <ScreenHandler screen={screen} theme={theme} iframeRef={iframeRef}/>
+          <ScreenHandler screen={screen} theme={theme} iframeRef={iframeRef} projectId={projectDetail?.projectId}/>
         </div>
         <iframe 
           ref={iframeRef}

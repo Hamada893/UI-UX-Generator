@@ -9,6 +9,7 @@ import { ProjectDetail, ScreenConfig } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
 import Canvas from "./_shared/Canvas";
 import { SettingsContext } from "@/context/SettingsContext";
+import { RefreshDataContext } from "@/context/RefreshDataContext";
 
 export default function ProjectCanvasPage() {
   const { projectId } = useParams();
@@ -19,6 +20,7 @@ export default function ProjectCanvasPage() {
   const hasRequestedConfigRef = useRef(false)
   const hasRequestedUIRef = useRef(false)
   const { setSettingsDetails } = useContext(SettingsContext)
+  const { refreshData, setRefreshData } = useContext(RefreshDataContext);
 
   useEffect(() => {
     const resolvedProjectId = Array.isArray(projectId) ? projectId[0] : projectId
@@ -34,6 +36,12 @@ export default function ProjectCanvasPage() {
     }
     getProjectDetail();
   }, [projectId]);
+
+  useEffect(() => {
+    if (refreshData?.method === 'screenConfig') {
+      getProjectDetail()
+    }
+  }, [refreshData])
 
   const getProjectDetail = async () => {
     try {
