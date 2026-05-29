@@ -88,13 +88,14 @@ const onDelete = async () => {
 
 const editScreen = async () => {
   setLoading(true);
+  toast.info('Regenerating new screen... !');
   const result = await axios.post('/api/edit-screen', {
     projectId: projectId,
     screenId: screen?.screenId,
     userInput: editUserInput,
     oldCode: screen?.code,
   });
-  toast.info('Regenerating new screen... !');
+  toast.success('Screen regenerated successfully!')
   setRefreshData({method: 'screenConfig', date: Date.now()});
   setLoading(false);
 }

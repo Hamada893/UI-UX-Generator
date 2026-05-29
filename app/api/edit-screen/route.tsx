@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
                 content: [
                   {
                     type: "text",
-                    text: USER_INPUT,
+                    text: USER_INPUT + "Output HTML ONLY" + "NO markdown, NO comments, NO explanations",
                   },
                 ],
               },
