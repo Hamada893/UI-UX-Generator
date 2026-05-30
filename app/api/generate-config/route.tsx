@@ -110,15 +110,27 @@ export async function POST(req: NextRequest) {
           .where(eq(ProjectsTable.projectId, projectId as string));
       }
 
+      const generatedScreens = JSONAiResult.screens ?? [];
+
+      if (oldScreenDescription && generatedScreens.length !== 1) {
+        return NextResponse.json(
+          { error: "Model returned an invalid new-screen payload" },
+          { status: 502 }
+        );
+      }
+
       const existingRows = await db
         .select({ screenId: ScreenConfigTable.screenId })
         .from(ScreenConfigTable)
         .where(eq(ScreenConfigTable.projectId, projectId as string));
       const existingIds = new Set(existingRows.map((row) => row.screenId));
 
-      for (const screen of JSONAiResult.screens ?? []) {
+      for (const screen of generatedScreens) {
         if (existingIds.has(screen.id)) {
-          continue;
+          return NextResponse.json(
+                { error: "Model returned a duplicate screen id" },
+                { status: 409 }
+              );
         }
         await db.insert(ScreenConfigTable).values({
           projectId: projectId,

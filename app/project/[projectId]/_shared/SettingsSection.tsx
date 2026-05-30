@@ -52,7 +52,7 @@ function SettingsSection({ projectDetail, screenConfig }: Props) {
   }
 
   const generateNewScreen = async () => {
-    const userInput = userPrompt.trim() || projectDetail?.userInput?.trim() || ''
+    const userInput = userPrompt.trim()
     if (!userInput) {
       toast.error('Enter a prompt to generate a new screen')
       return
@@ -73,9 +73,9 @@ function SettingsSection({ projectDetail, screenConfig }: Props) {
     }))
     const payload = {
       projectId: projectDetail.projectId,
-      projectName: projectName || projectDetail.projectName,
+      projectName: projectDetail.projectName,
       deviceType: projectDetail.deviceType,
-      theme: selectedTheme || projectDetail.theme,
+      theme: projectDetail.theme,
       projectVisualDescription: projectDetail.projectVisualDescription,
       userInput,
       oldScreenDescription: screenConfig?.[0]?.screenDescription ?? null,
@@ -84,7 +84,7 @@ function SettingsSection({ projectDetail, screenConfig }: Props) {
     try {
       const result = await axios.post('/api/generate-config', payload)
       setRefreshData({ method: 'screenConfig', date: Date.now() });
-      toast.success('New screen generated successfully!')
+      toast.success('New screen generation started!')
       console.log(result?.data);
     } catch (error) {
       console.error('Failed to generate new screen', error)
