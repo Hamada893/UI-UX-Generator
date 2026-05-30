@@ -6,16 +6,27 @@ import { Textarea } from '@/components/ui/textarea'
 import { Camera, Share, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { THEME_NAME_LIST, ThemeKey, THEMES, normalizeThemeKey } from '@/data/themes'
-import { ProjectDetail } from '@/type/types'
+import { ProjectDetail, ScreenConfig } from '@/type/types'
 import { useEffect } from 'react'
 import { SettingsContext } from '@/context/SettingsContext'
+import axios from 'axios'
+import { toast } from 'sonner'
+import { RefreshDataContext } from '@/context/RefreshDataContext'
+import { Loader2Icon } from 'lucide-react'
 
-function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
+type Props = {
+  projectDetail: ProjectDetail | undefined,
+  screenConfig?: ScreenConfig[],
+}
+
+function SettingsSection({ projectDetail, screenConfig }: Props) {
 
   const { settingsDetails, setSettingsDetails } = useContext(SettingsContext)
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey>(THEME_NAME_LIST[0])
   const [projectName, setProjectName] = useState<string>(projectDetail?.projectName || '')
   const [userPrompt, setUserPrompt] = useState<string>('')
+  const [loading, setLoading] = useState(false)
+  const { refreshData, setRefreshData } = useContext(RefreshDataContext);
 
   useEffect(() => {
     if (!projectDetail?.projectId) {
@@ -38,6 +49,49 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
       ...prev,
       theme: theme
     }))
+  }
+
+  const generateNewScreen = async () => {
+    const userInput = userPrompt.trim()
+    if (!userInput) {
+      toast.error('Enter a prompt to generate a new screen')
+      return
+    }
+    if (!projectDetail?.projectId || !projectDetail?.deviceType) {
+      toast.error('Project details are still loading. Try again in a moment.')
+      return
+    }
+
+    setLoading(true)
+    toast.info('Generating new screen...')
+    setUserPrompt('')
+    const existingScreens = (screenConfig ?? []).map((screen) => ({
+      id: screen.screenId,
+      name: screen.screenName,
+      purpose: screen.purpose,
+      layoutDescription: screen.screenDescription,
+    }))
+    const payload = {
+      projectId: projectDetail.projectId,
+      projectName: projectDetail.projectName,
+      deviceType: projectDetail.deviceType,
+      theme: projectDetail.theme,
+      projectVisualDescription: projectDetail.projectVisualDescription,
+      userInput,
+      oldScreenDescription: screenConfig?.[0]?.screenDescription ?? null,
+      existingScreens,
+    }
+    try {
+      const result = await axios.post('/api/generate-config', payload)
+      setRefreshData({ method: 'screenConfig', date: Date.now() });
+      toast.success('New screen generation started!')
+      console.log(result?.data);
+    } catch (error) {
+      console.error('Failed to generate new screen', error)
+      toast.error('Failed to generate new screen');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -63,8 +117,18 @@ function SettingsSection({ projectDetail }: { projectDetail: ProjectDetail }) {
 
       <div className='mt-5'>
         <h2 className='text-sm mb-2'>Generate New Screen</h2>
-        <Textarea placeholder='Enter prompt to generate using AI' onChange={(e) => setUserPrompt(e.target?.value || '')} />
-        <Button size={'sm'} className='cursor-pointer mt-3 w-full'><Sparkles/>Generate With AI</Button>
+        <Textarea
+          placeholder='Enter prompt to generate using AI'
+          value={userPrompt}
+          onChange={(e) => setUserPrompt(e.target?.value || '')}
+          
+        />
+        <Button 
+          size={'sm'} 
+          className='cursor-pointer mt-3 w-full' 
+          disabled={loading}
+          onClick={generateNewScreen}
+        >{loading ? <Loader2Icon className='animate-spin' /> : <Sparkles/>} Generate With AI</Button>
       </div>
 
       <div className='mt-5'>

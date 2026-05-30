@@ -7,6 +7,7 @@ import { ProjectsTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
 import { normalizeThemeKey } from "@/data/themes";
 import { currentUser } from "@clerk/nextjs/server";
+import { GENRATE_NEW_SCREEN_IN_EXISITING_PROJECT_PROJECT } from "@/data/Prompt";
 
 const parseAiJson = (raw: string) => {
   const trimmed = raw.trim();
@@ -34,7 +35,16 @@ const parseAiJson = (raw: string) => {
 };
 
 export async function POST(req: NextRequest) {
-  const { userInput, deviceType, projectId } = await req.json();
+  const {
+    userInput,
+    deviceType,
+    projectId,
+    projectName,
+    theme,
+    oldScreenDescription,
+    existingScreens,
+    projectVisualDescription,
+  } = await req.json();
 
   if (!projectId || !userInput || !deviceType) {
     return NextResponse.json(
@@ -54,10 +64,9 @@ export async function POST(req: NextRequest) {
             content: [
               {
                 type: "text",
-                text: APP_LAYOUT_CONFIG_PROMPT.replaceAll(
-                  "{deviceType}",
-                  deviceType
-                ),
+                text: oldScreenDescription ? 
+                GENRATE_NEW_SCREEN_IN_EXISITING_PROJECT_PROJECT.replaceAll("{deviceType}", deviceType).replaceAll("{projectName}", projectName).replaceAll("{theme}", theme).replaceAll("{oldScreenDescription}", oldScreenDescription)
+                : APP_LAYOUT_CONFIG_PROMPT.replaceAll("{deviceType}", deviceType),
               },
             ],
           },
@@ -66,7 +75,14 @@ export async function POST(req: NextRequest) {
             content: [
               {
                 type: "text",
-                text: userInput,
+                text: oldScreenDescription
+                  ? `${userInput}\n\nexistingProject:\n${JSON.stringify({
+                      projectName: projectName ?? "",
+                      theme: theme ?? "",
+                      projectVisualDescription: projectVisualDescription ?? "",
+                      screens: existingScreens ?? [],
+                    })}\n\nOld screen description is: ${oldScreenDescription}`
+                  : userInput,
               },
             ],
           },
@@ -79,26 +95,60 @@ export async function POST(req: NextRequest) {
     const JSONAiResult = parseAiJson(firstContent);
 
     if (JSONAiResult?.projectVisualDescription && JSONAiResult?.projectName) {
-      const theme = normalizeThemeKey(JSONAiResult?.theme);
-      await db
-        .update(ProjectsTable)
-        .set({
-          projectVisualDescription: JSONAiResult?.projectVisualDescription,
-          projectName: JSONAiResult?.projectName,
-          theme,
-        })
-        .where(eq(ProjectsTable.projectId, projectId as string));
+      const normalizedTheme = normalizeThemeKey(
+        oldScreenDescription ? (theme ?? JSONAiResult?.theme) : JSONAiResult?.theme
+      );
 
-        for (const screen of JSONAiResult.screens ?? []) {
-          await db.insert(ScreenConfigTable).values({
-            projectId: projectId,
-            purpose: screen.purpose,
-            screenDescription: screen?.layoutDescription,
-            screenId: screen?.id,
-            screenName: screen?.name,
-          });
+      if (!oldScreenDescription) {
+        await db
+          .update(ProjectsTable)
+          .set({
+            projectVisualDescription: JSONAiResult?.projectVisualDescription,
+            projectName: JSONAiResult?.projectName,
+            theme: normalizedTheme,
+          })
+          .where(eq(ProjectsTable.projectId, projectId as string));
+      }
+
+      const generatedScreens = JSONAiResult.screens ?? [];
+
+      if (oldScreenDescription && generatedScreens.length !== 1) {
+        return NextResponse.json(
+          { error: "Model returned an invalid new-screen payload" },
+          { status: 502 }
+        );
+      }
+
+      const existingRows = await db
+        .select({ screenId: ScreenConfigTable.screenId })
+        .from(ScreenConfigTable)
+        .where(eq(ScreenConfigTable.projectId, projectId as string));
+      const existingIds = new Set(existingRows.map((row) => row.screenId));
+
+      for (const screen of generatedScreens) {
+        if (existingIds.has(screen.id)) {
+          return NextResponse.json(
+                { error: "Model returned a duplicate screen id" },
+                { status: 409 }
+              );
         }
-      return NextResponse.json({ ...JSONAiResult, theme });
+        await db.insert(ScreenConfigTable).values({
+          projectId: projectId,
+          purpose: screen.purpose,
+          screenDescription: screen?.layoutDescription,
+          screenId: screen?.id,
+          screenName: screen?.name,
+        });
+        existingIds.add(screen.id);
+      }
+
+      return NextResponse.json({
+        ...JSONAiResult,
+        projectName: projectName ?? JSONAiResult?.projectName,
+        theme: normalizedTheme,
+        projectVisualDescription:
+          projectVisualDescription ?? JSONAiResult?.projectVisualDescription,
+      });
     } else {
       return NextResponse.json(
         { error: "Failed to generate project config, Internal Server Error" },

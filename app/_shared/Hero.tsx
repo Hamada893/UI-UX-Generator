@@ -68,7 +68,7 @@ function Hero() {
 }
 
   return (
-    <div className='p-10 md:px-24 lg:px-48 xl:px-60 mt-20'>
+    <div className='p-15 md:px-24 lg:px-48 xl:px-60 mt-20'>
       <div className='absolute w-full h-full inset-0 z-[-1] flex items-center justify-center'>
       <GridBackgroundDemo />
       </div>
@@ -99,8 +99,8 @@ function Hero() {
     <div>
       <h2 className='text-5xl font-bold text-center'>
           Create Beautiful 
-          <span className='text-primary'> Mobile</span> App <FlipWordsDemo duration={1000}/></h2>
-      <p className='text-center text-gray-600 mt-3 text-lg'>Imagine your idea and turn it into reality.</p>
+          <span className='text-primary'> Mobile</span> App <FlipWordsDemo duration={1200}/></h2>
+      <p className='text-center py-2 text-gray-600 mt-3 text-lg'>Imagine your idea and turn it into reality.</p>
     </div>
       
       
