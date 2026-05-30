@@ -139,7 +139,8 @@ const onTakeScreenshot = async (saveOnly = false) => {
         const headerH = 40; // same as your header
         const outW =
             Math.max(iframes.length * (SCREEN_WIDTH + GAP), SCREEN_WIDTH) * scale;
-        const outH = SCREEN_HEIGHT * scale;
+        const maxShotH = Math.max(...shotCanvases.map((c) => c.height));
+        const outH = maxShotH + headerH * scale;
 
         const out = document.createElement("canvas");
         out.width = outW;
