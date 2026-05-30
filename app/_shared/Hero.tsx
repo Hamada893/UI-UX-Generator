@@ -24,7 +24,8 @@ import { suggestions } from '@/data/constant'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import  Typewriter  from '@/components/fancy/text/typewriter'
+import FlipWordsDemo from '@/src/components/flip-words-demo'
+import GridBackgroundDemo from '@/src/components/grid-background-demo'
 
 function Hero() {
 
@@ -68,6 +69,9 @@ function Hero() {
 
   return (
     <div className='p-10 md:px-24 lg:px-48 xl:px-60 mt-20'>
+      <div className='absolute w-full h-full inset-0 z-[-1] flex items-center justify-center'>
+      <GridBackgroundDemo />
+      </div>
       <div className='flex items-center justify-center w-full mb-5'>
         <div className="group relative max-w-sm mx-auto flex items-center justify-center rounded-full px-4 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
         <span
@@ -91,23 +95,13 @@ function Hero() {
         <ChevronRight className="ml-1 size-4 stroke-neutral-500 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
       </div>
     </div>
+
+    <div>
       <h2 className='text-5xl font-bold text-center'>
-          Create <Typewriter
-                  text={[
-                    "High Quality",
-                    "Beautiful",
-                    "Responsive",
-                    "Fast",
-                    "Stunning",
-                    "Polished",
-                  ]}
-                  speed={70}
-                  waitTime={1500}
-                  deleteSpeed={40}
-                  cursorChar={"_"}
-                />
-          <span className='text-primary'>Mobile</span> App Designs</h2>
+          Create Beautiful 
+          <span className='text-primary'> Mobile</span> App <FlipWordsDemo duration={1000}/></h2>
       <p className='text-center text-gray-600 mt-3 text-lg'>Imagine your idea and turn it into reality.</p>
+    </div>
       
       
       <div className="flex w-full gap-6 items-center justify-center mt-10">
