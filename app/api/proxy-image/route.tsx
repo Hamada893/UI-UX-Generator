@@ -20,7 +20,17 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const upstream = await fetch(target.toString(), { cache: "force-cache" });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
+    let upstream: Response;
+    try {
+      upstream = await fetch(target.toString(), {
+        cache: "force-cache",
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
     if (!upstream.ok) {
       return NextResponse.json(
         { error: "Failed to fetch image" },

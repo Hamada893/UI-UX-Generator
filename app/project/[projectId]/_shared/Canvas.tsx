@@ -139,7 +139,8 @@ const onTakeScreenshot = async (saveOnly = false) => {
         const headerH = 40; // same as your header
         const outW =
             Math.max(iframes.length * (SCREEN_WIDTH + GAP), SCREEN_WIDTH) * scale;
-        const outH = SCREEN_HEIGHT * scale;
+        const maxShotH = Math.max(...shotCanvases.map((c) => c.height));
+        const outH = maxShotH + headerH * scale;
 
         const out = document.createElement("canvas");
         out.width = outW;
@@ -160,8 +161,7 @@ const onTakeScreenshot = async (saveOnly = false) => {
 
         // 3) download
         const url = out.toDataURL("image/png");
-        console.log(url);
-        updateProjectWithScreenshot(url);
+        await updateProjectWithScreenshot(url);
         if (!saveOnly) {
           const a = document.createElement("a");
           a.href = url;
@@ -175,13 +175,17 @@ const onTakeScreenshot = async (saveOnly = false) => {
 };
 
   const updateProjectWithScreenshot = async (base64Url: string) => {
-    const result = await axios.put('/api/project', {
-      screenshot: base64Url,
-      projectId: projectDetail.projectId,
-      theme: projectDetail.theme,
-      projectName: projectDetail.projectName,
-    })
-    console.log(result?.data);
+    try {
+      await axios.put('/api/project', {
+        screenshot: base64Url,
+        projectId: projectDetail.projectId,
+        theme: projectDetail.theme,
+        projectName: projectDetail.projectName,
+      })
+      toast.success("Screenshot saved successfully!");
+    } catch (e) {
+      toast.error("Failed to update project with screenshot: " + (e as Error)?.message);
+    }
   }
 
   return (
