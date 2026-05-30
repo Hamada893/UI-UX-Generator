@@ -17,9 +17,10 @@ import { Loader2Icon } from 'lucide-react'
 type Props = {
   projectDetail: ProjectDetail | undefined,
   screenConfig?: ScreenConfig[],
+  takeScreenshot: any,
 }
 
-function SettingsSection({ projectDetail, screenConfig }: Props) {
+function SettingsSection({ projectDetail, screenConfig, takeScreenshot }: Props) {
 
   const { settingsDetails, setSettingsDetails } = useContext(SettingsContext)
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey>(THEME_NAME_LIST[0])
@@ -175,8 +176,8 @@ function SettingsSection({ projectDetail, screenConfig }: Props) {
       <div className='mt-5'>
         <h2 className='text-sm mb-2'>Extras</h2>
         <div className='flex gap-3'>
-          <Button size={'sm'} variant={'outline'} className='mt-2'><Camera/>Screenshot</Button>
-          <Button size={'sm'} variant={'outline'} className='mt-2'><Share/>Share</Button>
+          <Button size={'sm'} variant={'outline'} className='mt-2 cursor-pointer' onClick={takeScreenshot}><Camera/>Screenshot</Button>
+          <Button size={'sm'} variant={'outline'} className='mt-2 cursor-pointer'><Share/>Share</Button>
         </div>
       </div>
     </div>
