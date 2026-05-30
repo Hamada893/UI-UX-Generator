@@ -19,8 +19,11 @@ export default function ProjectCanvasPage() {
   const [loadingMsg, setLoadingMsg] = useState('Loading');
   const hasRequestedConfigRef = useRef(false)
   const isGeneratingUIRef = useRef(false)
+  const shouldAutoScreenshotRef = useRef(false)
   const { setSettingsDetails } = useContext(SettingsContext)
   const { refreshData } = useContext(RefreshDataContext);
+  type ScreenshotRequest = { saveOnly: boolean; nonce: number }
+  const [screenshotRequest, setScreenshotRequest] = useState<ScreenshotRequest | null>(null);
 
   useEffect(() => {
     const resolvedProjectId = Array.isArray(projectId) ? projectId[0] : projectId
@@ -42,6 +45,20 @@ export default function ProjectCanvasPage() {
       void getProjectDetail()
     }
   }, [refreshData])
+
+  useEffect(() => {
+    if (!shouldAutoScreenshotRef.current) return;
+    if (isLoading) return;
+    if (!projectDetail || screenConfig.length === 0) return;
+    if (screenConfig.some((s) => !s.code)) return;
+
+    shouldAutoScreenshotRef.current = false;
+    const timer = window.setTimeout(() => {
+      setScreenshotRequest({ saveOnly: true, nonce: Date.now() });
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [screenConfig, isLoading, projectDetail]);
 
   const getProjectDetail = async () => {
     try {
@@ -127,6 +144,7 @@ export default function ProjectCanvasPage() {
       console.error('Failed to generate screen UI', error);
     } finally {
       setIsLoading(false)
+      shouldAutoScreenshotRef.current = true
     }
   }
 
@@ -143,12 +161,14 @@ export default function ProjectCanvasPage() {
         <SettingsSection
           projectDetail={projectDetail as ProjectDetail}
           screenConfig={screenConfig}
+          takeScreenshot={() => setScreenshotRequest({ saveOnly: false, nonce: Date.now() })}
         />
 
         <div className="min-w-0 flex-1">
           <Canvas
             projectDetail={projectDetail as ProjectDetail}
             screenConfig={screenConfig as ScreenConfig[]}
+            takeScreenshot={screenshotRequest}
           />
         </div>
       </div>

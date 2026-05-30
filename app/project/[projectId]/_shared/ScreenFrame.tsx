@@ -15,15 +15,16 @@ type Props = {
   htmlCode: string | undefined,
   projectDetail: ProjectDetail | undefined,
   screen: ScreenConfig,
+  iframeRef: any,
 }
-function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, projectDetail, screen }: Props) {
+function ScreenFrame({ x, y, setPanningEnabled, width, height, htmlCode, projectDetail, screen, iframeRef }: Props) {
   const { settingsDetails } = useContext(SettingsContext)
   const themeKey = (settingsDetails?.theme ?? projectDetail?.theme) as ThemeKey | undefined
   const theme = resolveTheme(themeKey)
   const frameIdRef = useRef(`frame-${Math.random().toString(36).slice(2, 10)}`);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const html = HtmlWrapper(theme, htmlCode as string);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  //const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [iframeSize, setIframeSize] = useState({ width, height });
   const instrumentedHtml = `
   ${html.replace(

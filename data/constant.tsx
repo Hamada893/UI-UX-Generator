@@ -38,7 +38,28 @@ export const suggestions = [
   },
 ];
 
+const PROXY_IMAGE_HOSTS = ["i.pravatar.cc"];
+
+export const proxyExternalImageUrl = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" || !PROXY_IMAGE_HOSTS.includes(parsed.hostname)) {
+      return url;
+    }
+    return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+  } catch {
+    return url;
+  }
+};
+
+const proxyExternalImagesInHtml = (htmlCode: string) =>
+  htmlCode.replace(
+    /(<img\b[^>]*\bsrc=)(["'])(https?:\/\/[^"']+)\2/gi,
+    (_, prefix, quote, url) => `${prefix}${quote}${proxyExternalImageUrl(url)}${quote}`
+  );
+
 export const HtmlWrapper = (theme: any, htmlCode: string) => {
+  const proxiedHtml = proxyExternalImagesInHtml(htmlCode ?? "");
   return `
   <!doctype html>
   <html>
@@ -66,7 +87,7 @@ export const HtmlWrapper = (theme: any, htmlCode: string) => {
     </style>
   </head>
   <body class="bg-[var(--background)] text-[var(--foreground)] w-full overflow-x-hidden">
-    ${htmlCode ?? ""}
+    ${proxiedHtml}
   </body>
   </html>
   `;

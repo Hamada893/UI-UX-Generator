@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const { projectName, theme, projectId } = await req.json();
+    const { projectName, theme, projectId, screenshot } = await req.json();
     const user = await currentUser();
     const email = user?.primaryEmailAddress?.emailAddress;
     if (!user || !email) {
@@ -91,6 +91,7 @@ export async function PUT(req: NextRequest) {
       .set({
         projectName: projectName,
         theme: theme,
+        screenshot: screenshot as string ?? null,
       })
       .where(and(eq(ProjectsTable.projectId, projectId), eq(ProjectsTable.userId, email)))
       .returning();

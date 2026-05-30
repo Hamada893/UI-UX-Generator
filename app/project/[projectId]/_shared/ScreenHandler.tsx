@@ -62,6 +62,18 @@ const takeIframeScreenshot = async () => {
         // wait one frame to ensure layout is stable
         await new Promise((res) => requestAnimationFrame(res));
 
+        await Promise.all(
+          (Array.from(doc.querySelectorAll("img")) as HTMLImageElement[]).map(
+            (img) =>
+              img.complete
+                ? Promise.resolve()
+                : new Promise<void>((resolve) => {
+                    img.onload = () => resolve();
+                    img.onerror = () => resolve();
+                  })
+          )
+        );
+
         const canvas = await html2canvas(body, {
             backgroundColor: null,
             useCORS: true,
