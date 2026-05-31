@@ -4,9 +4,10 @@
   deviceType: string,
   userInput: string | null,
   createdOn: string | null,
-  projectName: string | null,
-  theme: string | null,
+  projectName?: string | null,
+  theme?: string | null,
   projectVisualDescription: string | null,
+  screenshot?: string | null,
  }
 
  export type ScreenConfig = {

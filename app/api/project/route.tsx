@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/config/db";
 import { ProjectsTable, ScreenConfigTable, usersTable } from "@/config/schema";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,9 +58,28 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const projectId = searchParams.get('projectId');
     const user = await currentUser();
+    const email = user?.primaryEmailAddress?.emailAddress;
 
-    const result = await db.select().from(ProjectsTable).where(and(eq(ProjectsTable.projectId, projectId as string), eq(ProjectsTable.userId, user?.primaryEmailAddress?.emailAddress as string)));
-    const screenConfig = await db.select().from(ScreenConfigTable).where(eq(ScreenConfigTable.projectId, projectId as string));
+    if (!user || !email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!projectId) {
+      const result = await db.select().from(ProjectsTable).where(eq(ProjectsTable.userId, email))
+      .orderBy(desc(ProjectsTable.id));
+
+      return NextResponse.json(result)
+    }
+
+    const result = await db.select().from(ProjectsTable).where(and(eq(ProjectsTable.projectId, projectId as string), eq(ProjectsTable.userId, email)))
+
+    if (!result.length) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+    
+    const screenConfig = await db.select().from(ScreenConfigTable)
+    .where(eq(ScreenConfigTable.projectId, projectId as string))
+    .orderBy(desc(ScreenConfigTable.id));
     return NextResponse.json({
       projectDetail: result[0],
       screenConfig: screenConfig,
