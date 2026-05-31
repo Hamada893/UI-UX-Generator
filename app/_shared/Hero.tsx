@@ -26,6 +26,8 @@ import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import FlipWordsDemo from '@/src/components/flip-words-demo'
 import GridBackgroundDemo from '@/src/components/grid-background-demo'
+import TextHighlighter from '@/components/ui/text-highlighter';
+import BreathingTextDemo from '@/src/components/breathing-text-demo'
 
 function Hero() {
 
@@ -100,7 +102,16 @@ function Hero() {
       <h2 className='text-5xl font-bold text-center'>
           Create Beautiful 
           <span className='text-primary'> Mobile</span> App <FlipWordsDemo duration={1200}/></h2>
-      <p className='text-center py-2 text-gray-600 mt-3 text-lg'>Imagine your idea and turn it into reality.</p>
+      <p className='text-center py-2 text-gray-600 mt-3 text-lg'>
+        <span>Imagine </span>
+        <TextHighlighter 
+          type='zigzag' 
+          strokeWidth={3}
+          triggerOnView={true}
+          repeat={true}
+          highlightColor='#00ffb7ff'
+        >
+          your idea</TextHighlighter> and turn it into <BreathingTextDemo /></p>
     </div>
       
       
