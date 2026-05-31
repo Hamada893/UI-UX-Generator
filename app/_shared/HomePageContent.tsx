@@ -77,7 +77,7 @@ export default function HomePageContent() {
           showBlur ? 'opacity-100' : 'opacity-0'
         )}
       >
-        <ProgressiveBlur position="bottom" height="60%" className="h-full" />
+        <ProgressiveBlur position="bottom" height="50%" className="h-full" />
       </div>
     </div>
   )

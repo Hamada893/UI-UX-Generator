@@ -107,7 +107,7 @@ function Hero() {
           repeat={true}
           highlightColor='#00ffb7ff'
         >
-          your idea</TextHighlighter> and turn it into <BreathingTextDemo /></p>
+          your idea</TextHighlighter> and turn it into <BreathingTextDemo words="reality." /></p>
     </div>
       
       
