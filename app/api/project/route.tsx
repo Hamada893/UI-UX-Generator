@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/config/db";
 import { ProjectsTable, ScreenConfigTable, usersTable } from "@/config/schema";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
@@ -59,8 +59,17 @@ export async function GET(req: NextRequest) {
     const projectId = searchParams.get('projectId');
     const user = await currentUser();
 
+    if (!projectId) {
+      const result = await db.select().from(ProjectsTable).where(eq(ProjectsTable.userId, user?.primaryEmailAddress?.emailAddress as string))
+      .orderBy(desc(ProjectsTable.id));
+
+      return NextResponse.json(result)
+    }
+
     const result = await db.select().from(ProjectsTable).where(and(eq(ProjectsTable.projectId, projectId as string), eq(ProjectsTable.userId, user?.primaryEmailAddress?.emailAddress as string)));
-    const screenConfig = await db.select().from(ScreenConfigTable).where(eq(ScreenConfigTable.projectId, projectId as string));
+    const screenConfig = await db.select().from(ScreenConfigTable)
+    .where(eq(ScreenConfigTable.projectId, projectId as string))
+    .orderBy(desc(ScreenConfigTable.id));
     return NextResponse.json({
       projectDetail: result[0],
       screenConfig: screenConfig,

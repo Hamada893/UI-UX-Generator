@@ -10,7 +10,7 @@ function Header() {
   const {user} = useUser()
   
   return (
-    <header className="relative flex items-center justify-between px-10 py-4 z-50 bg-white backdrop-blur-sm border-b border-gray-50 ">
+    <header className="relative flex items-center justify-between px-10 py-4 z-50 bg-white backdrop-blur-sm border-b border-gray-100 ">
       <div className="flex items-center gap-2">
         <Link href="/">
           <Image src="/logo.png" alt="logo" width={40} height={40} />
