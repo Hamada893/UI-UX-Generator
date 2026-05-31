@@ -25,7 +25,6 @@ function ProjectList() {
         const result = await axios.get('/api/project')
         console.log(result.data)
         setProjectList(result.data)
-        toast.success('Projects list fetched successfully')
         } catch (error) {
             console.error('Failed to fetch projects list', error)
             toast.error('Failed to fetch projects list')
