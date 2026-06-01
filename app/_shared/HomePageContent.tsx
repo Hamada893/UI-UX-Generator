@@ -71,7 +71,7 @@ export default function HomePageContent() {
       </ScrollArea>
 
       <div
-        aria-hidden={!showBlur}
+        aria-hidden={true}
         className={cn(
           'pointer-events-none fixed inset-x-0 bottom-0 z-20 h-[min(25vh,12rem)] transition-opacity duration-300',
           showBlur ? 'opacity-100' : 'opacity-0'

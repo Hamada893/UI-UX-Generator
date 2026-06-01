@@ -9,7 +9,7 @@ interface TextProps extends React.HTMLAttributes<HTMLElement> {
   /**
    * The content to be displayed and animated
    */
-  children: React.ReactNode
+  children: string
 
   /**
    * HTML Tag to render the component as
