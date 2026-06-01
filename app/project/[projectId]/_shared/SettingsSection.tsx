@@ -13,6 +13,7 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { RefreshDataContext } from '@/context/RefreshDataContext'
 import { Loader2Icon } from 'lucide-react'
+import { useAuth } from '@clerk/nextjs'
 
 type Props = {
   projectDetail: ProjectDetail | undefined,
@@ -28,6 +29,8 @@ function SettingsSection({ projectDetail, screenConfig, takeScreenshot }: Props)
   const [userPrompt, setUserPrompt] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const { refreshData, setRefreshData } = useContext(RefreshDataContext);
+  const {has} = useAuth()
+  const hasPremiumAccess = has?.({ plan: 'unlimited' })
 
   useEffect(() => {
     if (!projectDetail?.projectId) {
@@ -53,6 +56,10 @@ function SettingsSection({ projectDetail, screenConfig, takeScreenshot }: Props)
   }
 
   const generateNewScreen = async () => {
+    if(!hasPremiumAccess) {
+      toast.error('Limited feature to paid user only.')
+      return
+    }
     const userInput = userPrompt.trim()
     if (!userInput) {
       toast.error('Enter a prompt to generate a new screen')

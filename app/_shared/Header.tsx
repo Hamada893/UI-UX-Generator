@@ -27,7 +27,7 @@ function Header() {
             </Link>
           </li>
           <li className="cursor-pointer">
-            <Link href="/" className="hover:text-primary transition-colors">
+            <Link href="/pricing" className="hover:text-primary transition-colors">
               Pricing
             </Link>
           </li>
