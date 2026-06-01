@@ -121,6 +121,7 @@ const captureOneIframe = async (iframe: HTMLIFrameElement) => {
 
 const onTakeScreenshot = async (saveOnly = false) => {
     try {
+        toast.info('Capturing screenshot...')
         const iframes = iframeRefs.current.filter(Boolean) as HTMLIFrameElement[];
         if (!iframes.length) {
             toast.error("No iframes found to capture");
