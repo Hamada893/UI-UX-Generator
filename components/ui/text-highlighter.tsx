@@ -126,6 +126,8 @@ const TextHighlighter: React.FC<TextHighlighterProps> = ({
           }}
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           preserveAspectRatio='none'
+          aria-hidden={true}
+          focusable={false}
         >
           <motion.path
             d={scaledPath}
@@ -136,7 +138,7 @@ const TextHighlighter: React.FC<TextHighlighterProps> = ({
             strokeLinejoin='round'
             variants={highlightVariants}
             initial='hidden'
-            animate={triggerOnView ? 'visible' : 'hidden'}
+            animate={!triggerOnView ? 'visible' : undefined}
             whileInView={triggerOnView ? 'visible' : undefined}
             viewport={
               triggerOnView ? { once: !repeat, margin: '-50px' } : undefined
@@ -171,6 +173,8 @@ const TextHighlighter: React.FC<TextHighlighterProps> = ({
           }}
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           preserveAspectRatio='none'
+          aria-hidden={true}
+          focusable={false}
         >
           <motion.path
             d={scaledPath}
