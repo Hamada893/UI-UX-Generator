@@ -29,7 +29,7 @@ function SettingsSection({ projectDetail, screenConfig, takeScreenshot }: Props)
   const [userPrompt, setUserPrompt] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const { refreshData, setRefreshData } = useContext(RefreshDataContext);
-  const {has} = useAuth()
+  const {has, isLoaded} = useAuth()
   const hasPremiumAccess = has?.({ plan: 'unlimited' })
 
   useEffect(() => {
@@ -56,7 +56,11 @@ function SettingsSection({ projectDetail, screenConfig, takeScreenshot }: Props)
   }
 
   const generateNewScreen = async () => {
-    if(!hasPremiumAccess) {
+    if (!isLoaded) {
+        toast.info('Checking your subscription, please try again in a moment.')
+        return
+      }
+      if (!hasPremiumAccess) {
       toast.error('Limited feature to paid user only.')
       return
     }
