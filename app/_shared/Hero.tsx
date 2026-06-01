@@ -25,7 +25,8 @@ import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import FlipWordsDemo from '@/src/components/flip-words-demo'
-import GridBackgroundDemo from '@/src/components/grid-background-demo'
+import TextHighlighter from '@/components/ui/text-highlighter';
+import BreathingTextDemo from '@/src/components/breathing-text-demo'
 
 function Hero() {
 
@@ -69,9 +70,6 @@ function Hero() {
 
   return (
     <div className='p-15 md:px-24 lg:px-48 xl:px-60 mt-20'>
-      <div className='absolute w-full h-full inset-0 z-[-1] flex items-center justify-center'>
-      <GridBackgroundDemo />
-      </div>
       <div className='flex items-center justify-center w-full mb-5'>
         <div className="group bottom-1.5 relative max-w-sm mx-auto flex items-center justify-center rounded-full bg-white px-4 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
         <span
@@ -100,7 +98,16 @@ function Hero() {
       <h2 className='text-5xl font-bold text-center'>
           Create Beautiful 
           <span className='text-primary'> Mobile</span> App <FlipWordsDemo duration={1200}/></h2>
-      <p className='text-center py-2 text-gray-600 mt-3 text-lg'>Imagine your idea and turn it into reality.</p>
+      <p className='text-center py-2 text-gray-600 mt-3 text-lg'>
+        <span>Imagine </span>
+        <TextHighlighter 
+          type='zigzag' 
+          strokeWidth={3}
+          triggerOnView={true}
+          repeat={true}
+          highlightColor='#00ffb7ff'
+        >
+          your idea</TextHighlighter> and turn it into <BreathingTextDemo words="reality." /></p>
     </div>
       
       
