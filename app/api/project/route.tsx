@@ -1,19 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@/config/db";
 import { ProjectsTable, ScreenConfigTable, usersTable } from "@/config/schema";
 import { and, desc, eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
+  
   try {
     const body = await req.json();
     const { userInput, deviceType, projectId } = body;
 
     const user = await currentUser();
     const email = user?.primaryEmailAddress?.emailAddress;
-
+    
     if (!user || !email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
+    const {has} = await auth()
+    const hasPremiumAccess = has({ plan: 'unlimited' })
+    const projects = await db.select().from(ProjectsTable)
+      .where(eq(ProjectsTable.userId, email as string))
+
+    if (projects.length >= 2 && !hasPremiumAccess) {
+      return NextResponse.json({msg: 'Limit Exceeded'})
     }
 
     const [dbUser] = await db

@@ -27,6 +27,7 @@ import axios from 'axios'
 import FlipWordsDemo from '@/src/components/flip-words-demo'
 import TextHighlighter from '@/components/ui/text-highlighter';
 import BreathingTextDemo from '@/src/components/breathing-text-demo'
+import { toast } from 'sonner'
 
 function Hero() {
 
@@ -54,6 +55,11 @@ function Hero() {
         deviceType: deviceType,
         projectId: projectId,
       })
+      if (result?.data?.msg === 'Limit Exceeded') {
+        toast.error('You have reached the maximum number of free projects. Upgrade to the Unlimited plan to create more projects.')
+        setLoading(false)
+        return
+      }
       setLoading(false)
       const createdProjectId = result?.data?.projectId ?? projectId
       if (!createdProjectId) {
