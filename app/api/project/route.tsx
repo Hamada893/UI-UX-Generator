@@ -12,6 +12,11 @@ export async function POST(req: NextRequest) {
 
     const user = await currentUser();
     const email = user?.primaryEmailAddress?.emailAddress;
+    
+    if (!user || !email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
     const {has} = await auth()
     const hasPremiumAccess = has({ plan: 'unlimited' })
     const projects = await db.select().from(ProjectsTable)
@@ -19,10 +24,6 @@ export async function POST(req: NextRequest) {
 
     if (projects.length >= 2 && !hasPremiumAccess) {
       return NextResponse.json({msg: 'Limit Exceeded'})
-    }
-
-    if (!user || !email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const [dbUser] = await db
