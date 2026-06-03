@@ -134,7 +134,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📸 Screenshots
 
-
+[![Homepage](imgs/homepage.png)](https://ui-ux-generator-five.vercel.app/)
+[![Canvas](imgs/canvas.png)](https://ui-ux-generator-five.vercel.app/)
 
 ---
 
