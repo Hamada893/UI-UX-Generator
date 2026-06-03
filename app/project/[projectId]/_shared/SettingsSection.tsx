@@ -61,7 +61,7 @@ function SettingsSection({ projectDetail, screenConfig, takeScreenshot }: Props)
         return
       }
       if (!hasPremiumAccess) {
-      toast.error('Limited feature to paid user only.')
+      toast.error('Limited feature to paid users only.')
       return
     }
     const userInput = userPrompt.trim()
