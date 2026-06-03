@@ -107,20 +107,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📁 Project Structure
-
-```
-├── app/                  # Next.js App Router pages and layouts
-├── components/           # Reusable React components
-│   ├── canvas/           # Zoom/pan canvas and screen rendering
-│   ├── editor/           # Screen editor and modification UI
-│   └── themes/           # Theme selector and color config
-├── lib/                  # Database client, AI helpers, utilities
-├── public/               # Static assets
-└── .env.local            # Environment variables (not committed)
-```
-
----
 
 ## 🔄 How It Works
 
